@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marwane Boubekeur — Sport Data Scientist</title>
+  <meta name="description" content="Marwane Boubekeur — Data Scientist & Sport Scientist. ML pipelines, computer vision, and performance analytics for elite sport." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d1117;
+      --bg2:      #161b22;
+      --bg3:      #1c2128;
+      --border:   #30363d;
+      --text:     #e6edf3;
+      --muted:    #7d8590;
+      --muted2:   #b1bac4;
+      --accent:   #00c896;
+      --accent2:  #00e5ad;
+      --accenth:  rgba(0,200,150,0.08);
+      --font:     'Inter', sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+      --r:        10px;
+      --t:        0.22s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--accent); color: #000; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 56px;
+      background: rgba(13,17,23,0);
+      transition: background var(--t), border-color var(--t);
+      border-bottom: 1px solid transparent;
+    }
+    nav.scrolled { background: rgba(13,17,23,0.92); backdrop-filter: blur(16px); border-bottom-color: var(--border); }
+
+    .nav-logo { font-family: var(--mono); font-size: 13px; color: var(--accent); letter-spacing: 0.04em; }
+
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 13px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; transition: color var(--t); }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .nav-right a { font-size: 13px; color: var(--muted); transition: color var(--t); }
+    .nav-right a:hover { color: var(--accent); }
+    .nav-cv {
+      font-size: 12px; font-family: var(--mono);
+      border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px;
+      color: var(--accent); transition: all var(--t);
+    }
+    .nav-cv:hover { background: var(--accenth); border-color: var(--accent); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh; display: grid; grid-template-columns: 1fr auto;
+      align-items: center; gap: 60px;
+      padding: 120px 56px 80px;
+    }
+
+    .hero-left {}
+
+    .hero-status {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-family: var(--mono); color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    .hero-name {
+      font-size: clamp(44px, 6.5vw, 80px);
+      font-weight: 700; letter-spacing: -0.03em; line-height: 1.05;
+      margin-bottom: 14px;
+    }
+    .hero-name span { color: var(--accent); }
+
+    .hero-role {
+      font-size: clamp(15px, 1.8vw, 19px);
+      color: var(--muted2); font-weight: 300; margin-bottom: 12px;
+    }
+
+    .hero-tagline {
+      font-size: clamp(13px, 1.3vw, 15px);
+      color: var(--muted); max-width: 500px; margin-bottom: 40px; line-height: 1.6;
+      font-style: italic;
+    }
+
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px; border-radius: var(--r);
+      font-size: 13px; font-weight: 500; transition: all var(--t); border: none; cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: #000; font-weight: 600; }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,200,150,0.25); }
+    .btn-ghost { background: transparent; color: var(--muted2); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── HERO RIGHT — info cards ── */
+    .hero-right {
+      display: flex; flex-direction: column; gap: 12px;
+      min-width: 260px;
+    }
+
+    .info-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 16px 20px;
+      transition: border-color var(--t);
+    }
+    .info-card:hover { border-color: var(--accent); }
+
+    .info-label {
+      font-family: var(--mono); font-size: 10px; color: var(--accent);
+      letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px;
+    }
+    .info-value { font-size: 13px; color: var(--muted2); line-height: 1.5; }
+    .info-value strong { color: var(--text); display: block; font-weight: 500; }
+    .info-value span { display: block; font-size: 12px; color: var(--muted); }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border); }
+
+    /* ── SECTION ── */
+    .wrap { padding: 0 56px; }
+    section { padding: 88px 0; }
+
+    .sec-label { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px; }
+    .sec-title { font-size: clamp(26px, 3.5vw, 40px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 14px; }
+    .sec-sub { font-size: 15px; color: var(--muted); max-width: 560px; line-height: 1.7; margin-bottom: 56px; }
+
+    /* ── PROJECTS ── */
+    .projects { display: flex; flex-direction: column; gap: 32px; }
+
+    /* featured card */
+    .pcard {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; transition: border-color var(--t), box-shadow var(--t);
+    }
+    .pcard:hover { border-color: var(--accent); box-shadow: 0 0 40px rgba(0,200,150,0.06); }
+
+    .pcard-inner { display: grid; grid-template-columns: 1fr 1fr; }
+    .pcard-inner.reverse { direction: rtl; }
+    .pcard-inner.reverse > * { direction: ltr; }
+
+    .pcard-text { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+    .pcard-visual {
+      background: var(--bg3); border-left: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+      position: relative; min-height: 320px;
+    }
+    .pcard-inner.reverse .pcard-visual { border-left: none; border-right: 1px solid var(--border); }
+
+    /* small cards */
+    .pcards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    .pcard-sm {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+      padding: 28px; display: flex; flex-direction: column;
+      transition: border-color var(--t), transform var(--t);
+    }
+    .pcard-sm:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+    /* shared project parts */
+    .pmeta { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .pnum { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+    .ptype { font-size: 11px; color: var(--muted); background: var(--bg3); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); }
+
+    .ptitle { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px; line-height: 1.3; }
+    .pcard-sm .ptitle { font-size: 17px; }
+
+    .pdesc { font-size: 13px; color: var(--muted); line-height: 1.75; margin-bottom: 20px; flex: 1; }
+
+    .pmetrics { display: flex; gap: 28px; margin-bottom: 22px; }
+    .pm-val { font-size: 26px; font-weight: 700; color: var(--accent); font-family: var(--mono); display: block; line-height: 1; }
+    .pm-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; display: block; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
+    .tag { font-size: 11px; font-family: var(--mono); color: var(--muted); background: var(--bg3); padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border); }
+
+    .plinks { display: flex; gap: 18px; margin-top: auto; }
+    .plink { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; transition: color var(--t); }
+    .plink:hover { color: var(--accent); }
+    .plink svg { width: 13px; height: 13px; }
+
+    /* ── Viz panels ── */
+    .viz-roc {
+      padding: 28px; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .viz-title { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 20px; letter-spacing: 0.08em; }
+
+    svg.roc-chart { width: 100%; max-width: 240px; }
+
+    .viz-pitch {
+      padding: 24px; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    .viz-court {
+      padding: 24px; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    /* risk tier badges */
+    .risk-tiers { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 220px; margin-top: 16px; }
+    .risk-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-family: var(--mono); }
+    .risk-high { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #e74c3c; }
+    .risk-med  { background: rgba(243,156,18,0.12); border: 1px solid rgba(243,156,18,0.3); color: #f39c12; }
+    .risk-low  { background: rgba(0,200,150,0.1);  border: 1px solid rgba(0,200,150,0.3);  color: #00c896; }
+    .risk-bar  { height: 6px; border-radius: 3px; background: currentColor; }
+
+    /* ── SKILLS ── */
+    .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .skill-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 26px;
+      transition: border-color var(--t);
+    }
+    .skill-card:hover { border-color: var(--accent); }
+    .sk-icon { font-size: 22px; margin-bottom: 14px; }
+    .sk-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    .sk-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+    .sk-list li { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+    .sk-list li::before { content: '▸'; color: var(--accent); font-size: 10px; }
+
+    /* ── CONTACT ── */
+    #contact { text-align: center; }
+    #contact .sec-sub { margin: 0 auto 40px; }
+    .contact-email {
+      font-size: clamp(20px, 3vw, 36px); font-weight: 600; display: inline-block;
+      border-bottom: 2px solid var(--accent); padding-bottom: 3px;
+      margin-bottom: 44px; transition: color var(--t);
+    }
+    .contact-email:hover { color: var(--accent); }
+    .contact-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .clink {
+      display: flex; align-items: center; gap: 8px; font-size: 13px;
+      color: var(--muted); border: 1px solid var(--border); padding: 10px 20px;
+      border-radius: var(--r); transition: all var(--t);
+    }
+    .clink:hover { border-color: var(--accent); color: var(--accent); }
+    .clink svg { width: 15px; height: 15px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 56px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--muted); font-family: var(--mono);
+    }
+    footer a { color: var(--accent); transition: opacity var(--t); }
+    footer a:hover { opacity: 0.7; }
+
+    /* ── FADE UP ── */
+    .fu { opacity: 0; transform: translateY(22px); transition: opacity .55s ease, transform .55s ease; }
+    .fu.on { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1000px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 40px; }
+      .hero-right { flex-direction: row; flex-wrap: wrap; min-width: unset; }
+      .info-card { flex: 1; min-width: 140px; }
+      .wrap { padding: 0 24px; }
+      .pcard-inner, .pcard-inner.reverse { grid-template-columns: 1fr; direction: ltr; }
+      .pcard-visual { min-height: 220px; border-left: none !important; border-right: none !important; border-top: 1px solid var(--border); }
+      .pcards-row { grid-template-columns: 1fr 1fr; }
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .pcards-row { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <span class="nav-logo">MB.</span>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://github.com/Warmvne" target="_blank" rel="noopener">GitHub ↗</a>
+    <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn ↗</a>
+    <a href="Marwane_Boubekeur_CV.pdf" download class="nav-cv">CV ↓</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-status fu"><span class="dot"></span> Open to opportunities &mdash; Available 2026</div>
+    <h1 class="hero-name fu">Marwane<br/><span>Boubekeur</span></h1>
+    <p class="hero-role fu">Data Scientist &amp; Sport Scientist</p>
+    <p class="hero-tagline fu">"Turning raw data into performance decisions."</p>
+    <div class="hero-cta fu">
+      <a href="#work" class="btn btn-primary">View Projects →</a>
+      <a href="Marwane_Boubekeur_CV.pdf" download class="btn btn-ghost">Download CV ↓</a>
+    </div>
+  </div>
+
+  <div class="hero-right fu">
+    <div class="info-card">
+      <div class="info-label">Based in</div>
+      <div class="info-value">
+        <strong>Paris, France</strong>
+        <span>Open to relocation worldwide</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Focused on</div>
+      <div class="info-value">
+        <strong>Sport &amp; performance data</strong>
+        <span>Decisions, not dashboards</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Currently exploring</div>
+      <div class="info-value">
+        <strong>Computer Vision · LLM agents</strong>
+        <span>Real-time sport analytics</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Education</div>
+      <div class="info-value">
+        <strong>M.Eng. Data &amp; AI — ECE Paris</strong>
+        <span>CPGE MPSI/MP · Exchange London</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WORK -->
+<section id="work">
+  <div class="wrap">
+    <p class="sec-label fu">01 — Work</p>
+    <h2 class="sec-title fu">Selected Projects</h2>
+    <p class="sec-sub fu">End-to-end ML and computer vision systems at the intersection of sport, performance, and data science.</p>
+
+    <div class="projects">
+
+      <!-- NBA — FEATURED -->
+      <div class="pcard fu">
+        <div class="pcard-inner">
+          <div class="pcard-text">
+            <div class="pmeta">
+              <span class="pnum">01</span>
+              <span class="ptype">Machine Learning · Sports Science</span>
+            </div>
+            <h3 class="ptitle">NBA Load Management —<br/>Injury Risk Prediction</h3>
+            <p class="pdesc">
+              End-to-end ML pipeline predicting individual NBA player injury risk from historical workload and advanced performance data. Features temporal train/test split, 18+ engineered features, SHAP interpretability, and a three-tier risk system with actionable recommendations for coaching staff.
+            </p>
+            <div class="pmetrics">
+              <div><span class="pm-val">0.76</span><span class="pm-lbl">ROC-AUC</span></div>
+              <div><span class="pm-val">18+</span><span class="pm-lbl">Features</span></div>
+              <div><span class="pm-val">3</span><span class="pm-lbl">Risk Tiers</span></div>
+            </div>
+            <div class="tags">
+              <span class="tag">Python</span><span class="tag">XGBoost</span>
+              <span class="tag">SHAP</span><span class="tag">Temporal CV</span>
+              <span class="tag">pandas</span><span class="tag">scikit-learn</span>
+            </div>
+            <div class="plinks">
+              <a href="https://github.com/Warmvne/NBA-Project" target="_blank" class="plink">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                GitHub
+              </a>
+              <a href="https://colab.research.google.com/github/Warmvne/NBA-Project/blob/main/LOAD_MANAGEMENT_NBA.ipynb" target="_blank" class="plink">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Open in Colab ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- ROC curve SVG + risk tiers -->
+          <div class="pcard-visual">
+            <div class="viz-roc">
+              <div class="viz-title">ROC CURVE — GRADIENT BOOSTING</div>
+              <svg class="roc-chart" viewBox="0 0 200 180">
+                <!-- grid -->
+                <line x1="30" y1="10" x2="30" y2="155" stroke="#30363d" stroke-width="1"/>
+                <line x1="30" y1="155" x2="185" y2="155" stroke="#30363d" stroke-width="1"/>
+                <!-- tick labels -->
+                <text x="27" y="158" font-size="9" fill="#7d8590" text-anchor="end">0</text>
+                <text x="27" y="110" font-size="9" fill="#7d8590" text-anchor="end">.5</text>
+                <text x="27" y="63" font-size="9" fill="#7d8590" text-anchor="end">1</text>
+                <text x="30" y="170" font-size="9" fill="#7d8590" text-anchor="middle">0</text>
+                <text x="107" y="170" font-size="9" fill="#7d8590" text-anchor="middle">.5</text>
+                <text x="185" y="170" font-size="9" fill="#7d8590" text-anchor="middle">1</text>
+                <!-- axis labels -->
+                <text x="107" y="180" font-size="9" fill="#7d8590" text-anchor="middle">False Positive Rate</text>
+                <text x="8" y="107" font-size="9" fill="#7d8590" text-anchor="middle" transform="rotate(-90,8,107)">True Positive Rate</text>
+                <!-- diagonal (random) -->
+                <line x1="30" y1="155" x2="185" y2="10" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+                <!-- ROC curve (AUC≈0.76) -->
+                <polyline
+                  points="30,155 45,118 62,91 80,72 98,58 115,48 133,40 150,34 165,29 180,24 185,10"
+                  fill="none" stroke="#00c896" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- AUC label -->
+                <rect x="110" y="115" width="70" height="22" rx="4" fill="#1c2128" stroke="#30363d"/>
+                <text x="145" y="130" font-size="10" fill="#00c896" text-anchor="middle" font-family="monospace">AUC = 0.76</text>
+              </svg>
+
+              <div class="risk-tiers">
+                <div class="risk-row risk-high">
+                  <span>HIGH ≥0.55</span>
+                  <span>REST</span>
+                  <div class="risk-bar" style="width:52px"></div>
+                </div>
+                <div class="risk-row risk-med">
+                  <span>MED 0.35–0.55</span>
+                  <span>MONITOR</span>
+                  <div class="risk-bar" style="width:36px"></div>
+                </div>
+                <div class="risk-row risk-low">
+                  <span>LOW &lt;0.35</span>
+                  <span>PLAY</span>
+                  <div class="risk-bar" style="width:60px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Football CV -->
+      <div class="pcard fu">
+        <div class="pcard-inner reverse">
+          <div class="pcard-text">
+            <div class="pmeta">
+              <span class="pnum">02</span>
+              <span class="ptype">Computer Vision · Football</span>
+            </div>
+            <h3 class="ptitle">Football Computer Vision Analytics</h3>
+            <p class="pdesc">
+              End-to-end CV pipeline: player & ball detection with YOLOv8 + ByteTrack, bird's eye view via homography, Voronoi space control, formation detection, R3D-18 action recognition, and biomechanical shooting analysis with MediaPipe.
+            </p>
+            <div class="tags">
+              <span class="tag">YOLOv8</span><span class="tag">ByteTrack</span>
+              <span class="tag">OpenCV</span><span class="tag">MediaPipe</span>
+              <span class="tag">R3D-18</span><span class="tag">Homography</span>
+            </div>
+            <div class="plinks">
+              <a href="https://github.com/Warmvne/Football_ComputerVision" target="_blank" class="plink">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                GitHub ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- Football pitch SVG -->
+          <div class="pcard-visual">
+            <div class="viz-pitch">
+              <div class="viz-title">BIRD'S EYE VIEW — VORONOI SPACE CONTROL</div>
+              <svg viewBox="0 0 280 180" style="width:100%;max-width:300px">
+                <!-- pitch outline -->
+                <rect x="10" y="10" width="260" height="160" rx="3" fill="none" stroke="#30363d" stroke-width="1.5"/>
+                <!-- halfway line -->
+                <line x1="140" y1="10" x2="140" y2="170" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+                <!-- centre circle -->
+                <circle cx="140" cy="90" r="20" fill="none" stroke="#30363d" stroke-width="1"/>
+                <circle cx="140" cy="90" r="2" fill="#30363d"/>
+                <!-- left penalty area -->
+                <rect x="10" y="55" width="42" height="70" fill="none" stroke="#30363d" stroke-width="1"/>
+                <rect x="10" y="72" width="18" height="36" fill="none" stroke="#30363d" stroke-width="1"/>
+                <!-- right penalty area -->
+                <rect x="228" y="55" width="42" height="70" fill="none" stroke="#30363d" stroke-width="1"/>
+                <rect x="252" y="72" width="18" height="36" fill="none" stroke="#30363d" stroke-width="1"/>
+
+                <!-- Voronoi regions (simplified coloured polygons) -->
+                <!-- Team A (emerald) zones -->
+                <polygon points="10,10 80,10 60,55 30,70 10,60" fill="rgba(0,200,150,0.12)" stroke="rgba(0,200,150,0.3)" stroke-width="0.8"/>
+                <polygon points="80,10 140,10 140,50 100,65 60,55" fill="rgba(0,200,150,0.10)" stroke="rgba(0,200,150,0.3)" stroke-width="0.8"/>
+                <polygon points="10,60 30,70 20,110 10,120" fill="rgba(0,200,150,0.12)" stroke="rgba(0,200,150,0.3)" stroke-width="0.8"/>
+                <polygon points="30,70 60,55 100,65 85,110 50,120 20,110" fill="rgba(0,200,150,0.08)" stroke="rgba(0,200,150,0.3)" stroke-width="0.8"/>
+                <polygon points="10,120 20,110 50,120 30,155 10,155" fill="rgba(0,200,150,0.12)" stroke="rgba(0,200,150,0.3)" stroke-width="0.8"/>
+                <polygon points="50,120 85,110 100,65 140,50 140,130 90,155 30,155" fill="rgba(0,200,150,0.07)" stroke="rgba(0,200,150,0.3)" stroke-width="0.8"/>
+                <polygon points="90,155 140,130 140,170 10,170 10,155 30,155" fill="rgba(0,200,150,0.10)" stroke="rgba(0,200,150,0.3)" stroke-width="0.8"/>
+
+                <!-- Team B (blue) zones -->
+                <polygon points="140,10 210,10 200,50 160,60 140,50" fill="rgba(52,152,219,0.10)" stroke="rgba(52,152,219,0.3)" stroke-width="0.8"/>
+                <polygon points="210,10 270,10 270,55 240,65 200,50" fill="rgba(52,152,219,0.12)" stroke="rgba(52,152,219,0.3)" stroke-width="0.8"/>
+                <polygon points="160,60 200,50 240,65 230,110 185,115 145,100 140,50" fill="rgba(52,152,219,0.07)" stroke="rgba(52,152,219,0.3)" stroke-width="0.8"/>
+                <polygon points="240,65 270,55 270,120 250,125 230,110" fill="rgba(52,152,219,0.12)" stroke="rgba(52,152,219,0.3)" stroke-width="0.8"/>
+                <polygon points="145,100 185,115 180,155 140,155 140,130" fill="rgba(52,152,219,0.08)" stroke="rgba(52,152,219,0.3)" stroke-width="0.8"/>
+                <polygon points="185,115 230,110 250,125 240,155 180,155" fill="rgba(52,152,219,0.10)" stroke="rgba(52,152,219,0.3)" stroke-width="0.8"/>
+                <polygon points="250,125 270,120 270,170 140,170 140,155 240,155" fill="rgba(52,152,219,0.09)" stroke="rgba(52,152,219,0.3)" stroke-width="0.8"/>
+
+                <!-- Team A players -->
+                <circle cx="30" cy="35" r="5" fill="#00c896" opacity="0.9"/>
+                <circle cx="115" cy="38" r="5" fill="#00c896" opacity="0.9"/>
+                <circle cx="55" cy="88" r="5" fill="#00c896" opacity="0.9"/>
+                <circle cx="95" cy="70" r="5" fill="#00c896" opacity="0.9"/>
+                <circle cx="95" cy="115" r="5" fill="#00c896" opacity="0.9"/>
+                <circle cx="115" cy="148" r="5" fill="#00c896" opacity="0.9"/>
+                <circle cx="30" cy="148" r="5" fill="#00c896" opacity="0.9"/>
+                <circle cx="22" cy="90" r="5.5" fill="#00c896" stroke="#0d1117" stroke-width="1.5"/>
+
+                <!-- Team B players -->
+                <circle cx="160" cy="38" r="5" fill="#3498db" opacity="0.9"/>
+                <circle cx="245" cy="35" r="5" fill="#3498db" opacity="0.9"/>
+                <circle cx="185" cy="70" r="5" fill="#3498db" opacity="0.9"/>
+                <circle cx="220" cy="90" r="5" fill="#3498db" opacity="0.9"/>
+                <circle cx="185" cy="115" r="5" fill="#3498db" opacity="0.9"/>
+                <circle cx="160" cy="148" r="5" fill="#3498db" opacity="0.9"/>
+                <circle cx="245" cy="148" r="5" fill="#3498db" opacity="0.9"/>
+                <circle cx="258" cy="90" r="5.5" fill="#3498db" stroke="#0d1117" stroke-width="1.5"/>
+
+                <!-- Ball -->
+                <circle cx="140" cy="88" r="4" fill="white" stroke="#30363d" stroke-width="1"/>
+
+                <!-- Legend -->
+                <circle cx="18" cy="172" r="4" fill="#00c896"/>
+                <text x="26" y="176" font-size="9" fill="#7d8590">Team A — 52% space</text>
+                <circle cx="130" cy="172" r="4" fill="#3498db"/>
+                <text x="138" y="176" font-size="9" fill="#7d8590">Team B — 48%</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basketball CV -->
+      <div class="pcard fu">
+        <div class="pcard-inner">
+          <div class="pcard-text">
+            <div class="pmeta">
+              <span class="pnum">03</span>
+              <span class="ptype">Computer Vision · Basketball</span>
+            </div>
+            <h3 class="ptitle">Basketball Computer Vision Analytics</h3>
+            <p class="pdesc">
+              Full CV system for NBA analysis: shooting mechanics via MediaPipe (BEEF principle, elbow angle, knee valgus), offensive spacing score (Voronoi + convex hull), ball movement graph with NetworkX, and R3D-18 action recognition for 7 action classes.
+            </p>
+            <div class="tags">
+              <span class="tag">YOLOv8</span><span class="tag">MediaPipe</span>
+              <span class="tag">R3D-18</span><span class="tag">NetworkX</span>
+              <span class="tag">scipy</span><span class="tag">nba_api</span>
+            </div>
+            <div class="plinks">
+              <a href="https://github.com/Warmvne/Basketball_ComputerVision" target="_blank" class="plink">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                GitHub ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- Basketball half-court shot chart SVG -->
+          <div class="pcard-visual">
+            <div class="viz-court">
+              <div class="viz-title">SHOT CHART — HALF COURT</div>
+              <svg viewBox="0 0 240 200" style="width:100%;max-width:280px">
+                <!-- court outline -->
+                <rect x="10" y="10" width="220" height="175" rx="3" fill="none" stroke="#30363d" stroke-width="1.5"/>
+                <!-- backboard -->
+                <line x1="95" y1="10" x2="145" y2="10" stroke="#b1bac4" stroke-width="2.5"/>
+                <!-- hoop -->
+                <circle cx="120" cy="22" r="7" fill="none" stroke="#f39c12" stroke-width="1.5"/>
+                <!-- paint (key) -->
+                <rect x="82" y="10" width="76" height="60" fill="rgba(52,152,219,0.05)" stroke="#30363d" stroke-width="1"/>
+                <!-- free throw circle -->
+                <path d="M 82 70 A 38 38 0 0 0 158 70" fill="none" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+                <!-- restricted area -->
+                <path d="M 103 10 A 17 17 0 0 0 137 10" fill="none" stroke="#30363d" stroke-width="1"/>
+                <!-- 3pt line -->
+                <path d="M 10 75 L 10 10 M 230 75 L 230 10" stroke="#30363d" stroke-width="0" />
+                <line x1="10" y1="75" x2="38" y2="75" stroke="#30363d" stroke-width="1"/>
+                <line x1="202" y1="75" x2="230" y2="75" stroke="#30363d" stroke-width="1"/>
+                <path d="M 38 75 A 104 104 0 0 0 202 75" fill="none" stroke="#30363d" stroke-width="1"/>
+                <!-- midcourt -->
+                <line x1="10" y1="185" x2="230" y2="185" stroke="#30363d" stroke-width="1"/>
+
+                <!-- SHOTS — made (circle), missed (x) -->
+                <!-- Corner 3s made -->
+                <circle cx="18" cy="60" r="5" fill="#00c896" opacity="0.85"/>
+                <circle cx="22" cy="45" r="5" fill="#00c896" opacity="0.85"/>
+                <circle cx="219" cy="55" r="5" fill="#00c896" opacity="0.85"/>
+                <circle cx="215" cy="38" r="5" fill="#00c896" opacity="0.85"/>
+
+                <!-- Mid-range missed -->
+                <g stroke="#e74c3c" stroke-width="1.8" opacity="0.75">
+                  <line x1="55" y1="78" x2="63" y2="86"/><line x1="63" y1="78" x2="55" y2="86"/>
+                  <line x1="175" y1="75" x2="183" y2="83"/><line x1="183" y1="75" x2="175" y2="83"/>
+                  <line x1="88" y1="58" x2="96" y2="66"/><line x1="96" y1="58" x2="88" y2="66"/>
+                  <line x1="143" y1="55" x2="151" y2="63"/><line x1="151" y1="55" x2="143" y2="63"/>
+                </g>
+
+                <!-- Above the break 3s -->
+                <circle cx="65" cy="105" r="5" fill="#00c896" opacity="0.85"/>
+                <circle cx="90" cy="118" r="5" fill="#00c896" opacity="0.85"/>
+                <circle cx="120" cy="122" r="5" fill="#00c896" opacity="0.85"/>
+                <circle cx="152" cy="115" r="5" fill="#00c896" opacity="0.85"/>
+                <circle cx="177" cy="103" r="5" fill="#00c896" opacity="0.85"/>
+                <g stroke="#e74c3c" stroke-width="1.8" opacity="0.75">
+                  <line x1="78" y1="108" x2="86" y2="116"/><line x1="86" y1="108" x2="78" y2="116"/>
+                  <line x1="160" y1="107" x2="168" y2="115"/><line x1="168" y1="107" x2="160" y2="115"/>
+                </g>
+
+                <!-- Paint / inside made (bigger circles = higher freq) -->
+                <circle cx="120" cy="42" r="7" fill="#00c896" opacity="0.9"/>
+                <circle cx="106" cy="52" r="6" fill="#00c896" opacity="0.8"/>
+                <circle cx="135" cy="50" r="6" fill="#00c896" opacity="0.8"/>
+                <circle cx="120" cy="65" r="5" fill="#00c896" opacity="0.75"/>
+                <g stroke="#e74c3c" stroke-width="1.8" opacity="0.75">
+                  <line x1="97" y1="35" x2="105" y2="43"/><line x1="105" y1="35" x2="97" y2="43"/>
+                  <line x1="137" y1="35" x2="145" y2="43"/><line x1="145" y1="35" x2="137" y2="43"/>
+                </g>
+
+                <!-- legend -->
+                <circle cx="20" cy="194" r="4" fill="#00c896"/>
+                <text x="28" y="198" font-size="9" fill="#7d8590">Made</text>
+                <g stroke="#e74c3c" stroke-width="1.5">
+                  <line x1="72" y1="190" x2="78" y2="198"/><line x1="78" y1="190" x2="72" y2="198"/>
+                </g>
+                <text x="84" y="198" font-size="9" fill="#7d8590">Missed</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Small cards row -->
+      <div class="pcards-row">
+
+        <!-- Sport Scientist Curriculum -->
+        <div class="pcard-sm fu">
+          <div class="pmeta">
+            <span class="pnum">04</span>
+            <span class="ptype">Education · Open Source</span>
+          </div>
+          <h3 class="ptitle">Sport Scientist Curriculum</h3>
+          <p class="pdesc">Open-source 6-month curriculum: statistics, ML theory, Python, R, football analytics (StatsBomb, xG modeling), and basketball analytics (NBA metrics, tracking data). 37 notebooks with exercises and solutions.</p>
+          <div class="tags">
+            <span class="tag">Python</span><span class="tag">R</span>
+            <span class="tag">StatsBomb</span><span class="tag">37 notebooks</span>
+          </div>
+          <div class="plinks">
+            <a href="https://github.com/Warmvne/SportScientist-Curriculum" target="_blank" class="plink">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- BrainBridge -->
+        <div class="pcard-sm fu">
+          <div class="pmeta">
+            <span class="pnum">05</span>
+            <span class="ptype">Chrome Extension · JS</span>
+          </div>
+          <h3 class="ptitle">BrainBridge</h3>
+          <p class="pdesc">Chrome extension that intercepts AI API requests and launches cognitive mini-games during wait time — reducing idle time while improving user engagement with AI tools.</p>
+          <div class="tags">
+            <span class="tag">JavaScript</span>
+            <span class="tag">Chrome API</span>
+            <span class="tag">WebExtensions</span>
+          </div>
+          <div class="plinks">
+            <a href="https://github.com/Warmvne/BrainBridge" target="_blank" class="plink">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Acoustic Hackathon -->
+        <div class="pcard-sm fu">
+          <div class="pmeta">
+            <span class="pnum">06</span>
+            <span class="ptype">Hackathon · Signal Processing</span>
+          </div>
+          <h3 class="ptitle">Acoustic Person Localization</h3>
+          <p class="pdesc">Hackathon project developing ML solutions for person localization using audio Room Impulse Responses (RIRs). Signal processing + deep learning approach to indoor positioning.</p>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">Signal Processing</span>
+            <span class="tag">Deep Learning</span>
+          </div>
+          <div class="plinks">
+            <a href="https://github.com/Warmvne/ia_data_hack_acoustic" target="_blank" class="plink">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+
+      </div><!-- /pcards-row -->
+    </div><!-- /projects -->
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <p class="sec-label fu">02 — Skills</p>
+    <h2 class="sec-title fu">Technical Expertise</h2>
+    <p class="sec-sub fu">From raw data pipelines to deployed ML models and real-time computer vision systems.</p>
+
+    <div class="skills-grid">
+      <div class="skill-card fu">
+        <div class="sk-icon">⚡</div>
+        <h3 class="sk-title">Machine Learning</h3>
+        <ul class="sk-list">
+          <li>XGBoost, Random Forest, Gradient Boosting</li>
+          <li>Feature engineering & temporal CV</li>
+          <li>SHAP interpretability</li>
+          <li>Survival analysis (Cox PH)</li>
+          <li>Clustering — K-Means, DBSCAN</li>
+          <li>Dimensionality reduction — PCA, UMAP</li>
+        </ul>
+      </div>
+      <div class="skill-card fu">
+        <div class="sk-icon">👁</div>
+        <h3 class="sk-title">Computer Vision</h3>
+        <ul class="sk-list">
+          <li>YOLOv8 — detection & tracking</li>
+          <li>ByteTrack multi-object tracking</li>
+          <li>MediaPipe — pose estimation</li>
+          <li>Homography & perspective transform</li>
+          <li>R3D-18 — 3D action recognition</li>
+          <li>Optical flow (Farneback)</li>
+        </ul>
+      </div>
+      <div class="skill-card fu">
+        <div class="sk-icon">🏃</div>
+        <h3 class="sk-title">Sports Analytics</h3>
+        <ul class="sk-list">
+          <li>Load management & ACWR modeling</li>
+          <li>xG model development (StatsBomb)</li>
+          <li>NBA advanced metrics (BPM, WS, RAPTOR)</li>
+          <li>GPS & wearable data analysis</li>
+          <li>Player profiling & similarity tools</li>
+          <li>Tactical analysis — Voronoi, formations</li>
+        </ul>
+      </div>
+      <div class="skill-card fu">
+        <div class="sk-icon">🗄</div>
+        <h3 class="sk-title">Data Science</h3>
+        <ul class="sk-list">
+          <li>dbt · Snowflake · AWS S3</li>
+          <li>Azure Databricks & Delta Lake</li>
+          <li>Data Vault architecture</li>
+          <li>Pipeline automation (SQL + Python)</li>
+          <li>Docker · Git · CI/CD</li>
+        </ul>
+      </div>
+      <div class="skill-card fu">
+        <div class="sk-icon">💻</div>
+        <h3 class="sk-title">Languages</h3>
+        <ul class="sk-list">
+          <li>Python — pandas, sklearn, PyTorch</li>
+          <li>R — tidyverse, lme4, ggplot2</li>
+          <li>SQL — advanced queries & modeling</li>
+          <li>JavaScript — Chrome Extensions</li>
+          <li>English — TOEIC 915/990</li>
+        </ul>
+      </div>
+      <div class="skill-card fu">
+        <div class="sk-icon">📊</div>
+        <h3 class="sk-title">BI & Visualization</h3>
+        <ul class="sk-list">
+          <li>Power BI — dashboards, DAX</li>
+          <li>MicroStrategy semantic layer</li>
+          <li>Plotly · mplsoccer · ggplot2</li>
+          <li>KPI governance frameworks</li>
+          <li>Stakeholder reporting</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <p class="sec-label fu">03 — Contact</p>
+    <h2 class="sec-title fu">Let's build something meaningful.</h2>
+    <p class="sec-sub fu">Open to sport science roles, data scientist positions, and research collaborations in performance analytics.</p>
+
+    <div class="fu">
+      <a href="mailto:marwane.boubekeur@gmail.com" class="contact-email">
+        marwane.boubekeur@gmail.com
+      </a>
+    </div>
+
+    <div class="contact-row fu">
+      <a href="https://github.com/Warmvne" target="_blank" class="clink">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub — Warmvne
+      </a>
+      <a href="https://linkedin.com" target="_blank" class="clink">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a href="Marwane_Boubekeur_CV.pdf" download class="clink">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download CV
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Marwane Boubekeur</span>
+  <a href="#hero">Back to top ↑</a>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 30));
+
+  // Fade-up on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
+  }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+
+  document.querySelectorAll('.fu').forEach((el, i) => {
+    el.style.transitionDelay = (i % 5) * 0.07 + 's';
+    io.observe(el);
+  });
+
+  // Active nav
+  const secs = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    secs.forEach(s => { if (scrollY >= s.offsetTop - 130) cur = s.id; });
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#${cur}`));
+  });
+</script>
+
+</body>
+</html>
