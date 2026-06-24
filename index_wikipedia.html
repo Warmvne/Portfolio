@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marwane Boubekeur — Wikipedia</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #fff;
+      color: #202122;
+      font-family: -apple-system, 'Linux Libertine', Georgia, Times, serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    a { color: #3366cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:visited { color: #795cb2; }
+
+    /* ── TOP BAR ── */
+    #wiki-header {
+      background: #fff;
+      border-bottom: 1px solid #a7d7f9;
+      padding: 0;
+    }
+    .wiki-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 16px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #a2a9b1;
+      font-size: 12px; color: #54595d;
+    }
+    .wiki-logo { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 15px; color: #202122; }
+    .wiki-logo-sphere {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff 5%, #c8d8e8 40%, #7097b8 70%, #3d6080);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: bold; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      position: relative; overflow: hidden;
+    }
+    .wiki-topbar-right { display: flex; gap: 14px; font-size: 12px; }
+    .wiki-topbar-right a { color: #3366cc; }
+
+    .wiki-tabs {
+      display: flex; align-items: flex-end; gap: 0;
+      padding: 0 16px; background: #fff;
+    }
+    .wiki-tab {
+      padding: 6px 14px; font-size: 12px; border: 1px solid #a2a9b1;
+      border-bottom: none; border-radius: 2px 2px 0 0; margin-right: 2px;
+      color: #3366cc; cursor: pointer; background: #f8f9fa;
+    }
+    .wiki-tab.active { background: #fff; color: #202122; font-weight: normal; border-bottom: 1px solid #fff; margin-bottom: -1px; }
+
+    /* ── LAYOUT ── */
+    .wiki-body {
+      display: flex; max-width: 1220px; margin: 0 auto; padding: 12px 16px; gap: 24px;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .wiki-main { flex: 1; min-width: 0; border-top: 1px solid #a2a9b1; padding-top: 14px; }
+
+    .wiki-page-title {
+      font-family: 'Linux Libertine', Georgia, Times, serif;
+      font-size: 28px; font-weight: normal; color: #202122;
+      border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin-bottom: 10px;
+    }
+
+    .wiki-subtitle {
+      font-size: 13px; color: #54595d; font-style: italic; margin-bottom: 12px;
+    }
+
+    /* notice box */
+    .wiki-notice {
+      background: #eaf3fb; border: 1px solid #a2a9b1; border-radius: 2px;
+      padding: 8px 12px; margin-bottom: 18px; font-size: 12.5px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .wiki-notice-icon { font-size: 18px; flex-shrink: 0; }
+
+    /* infobox */
+    .wiki-infobox {
+      float: right; clear: right;
+      width: 280px; margin: 0 0 18px 24px;
+      border: 1px solid #a2a9b1; font-size: 13px;
+    }
+    .infobox-title {
+      background: #cee0f2; text-align: center; font-weight: bold;
+      padding: 7px; font-size: 14px;
+    }
+    .infobox-img {
+      width: 100%; height: 200px;
+      background: linear-gradient(135deg, #e8edf5 0%, #cdd6e8 50%, #b0bfd4 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px; border-bottom: 1px solid #a2a9b1;
+    }
+    .infobox-caption { text-align: center; font-size: 11px; color: #54595d; padding: 4px 6px; border-bottom: 1px solid #a2a9b1; }
+    .infobox-row { display: flex; border-bottom: 1px solid #eaecf0; }
+    .infobox-row:last-child { border-bottom: none; }
+    .infobox-label { width: 110px; flex-shrink: 0; padding: 5px 8px; background: #f8f9fa; font-weight: bold; color: #202122; font-size: 12px; }
+    .infobox-value { padding: 5px 8px; color: #202122; font-size: 12px; flex: 1; }
+
+    /* lead paragraph */
+    .wiki-lead { margin-bottom: 20px; }
+    .wiki-lead p { margin-bottom: 12px; }
+
+    /* TOC */
+    .wiki-toc {
+      background: #f8f9fa; border: 1px solid #a2a9b1; border-radius: 2px;
+      display: inline-block; padding: 12px 16px; margin-bottom: 20px;
+      font-size: 13px; min-width: 220px;
+    }
+    .wiki-toc-title { font-weight: bold; text-align: center; margin-bottom: 8px; font-size: 13px; }
+    .wiki-toc ol { padding-left: 20px; }
+    .wiki-toc li { margin-bottom: 3px; }
+    .wiki-toc a { color: #3366cc; }
+    .wiki-toc .toc-sub { padding-left: 14px; list-style: none; }
+    .wiki-toc .toc-sub li::before { content: counter(list-item, lower-roman) " "; color: #54595d; font-size: 11px; }
+
+    /* sections */
+    .wiki-section { margin-bottom: 24px; }
+    h2.wiki-h2 {
+      font-family: 'Linux Libertine', Georgia, Times, serif;
+      font-size: 19px; font-weight: normal;
+      border-bottom: 1px solid #a2a9b1; margin-bottom: 10px; padding-bottom: 4px;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    h2.wiki-h2 .edit-link { font-size: 11px; font-family: sans-serif; font-weight: normal; color: #3366cc; }
+    h3.wiki-h3 {
+      font-size: 15px; font-weight: bold; margin-bottom: 8px; margin-top: 14px;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    h3.wiki-h3 .edit-link { font-size: 11px; font-weight: normal; color: #3366cc; }
+
+    p { margin-bottom: 10px; }
+
+    /* tags inline */
+    .wiki-tag { font-family: 'Courier New', monospace; font-size: 12px; background: #f8f9fa; border: 1px solid #a2a9b1; padding: 1px 5px; border-radius: 2px; color: #202122; }
+
+    /* project table */
+    .wiki-table {
+      width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px;
+    }
+    .wiki-table th {
+      background: #eaecf0; border: 1px solid #a2a9b1;
+      padding: 6px 10px; text-align: left; font-weight: bold;
+    }
+    .wiki-table td {
+      border: 1px solid #a2a9b1; padding: 6px 10px; vertical-align: top;
+    }
+    .wiki-table tr:nth-child(even) td { background: #f8f9fa; }
+    .wiki-table .metric { font-weight: bold; font-family: 'Courier New', monospace; color: #c0392b; }
+
+    /* skills columns */
+    .wiki-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; margin-bottom: 16px; }
+    .wiki-col { padding: 8px 14px 8px 0; }
+    .wiki-col ul { padding-left: 18px; }
+    .wiki-col ul li { margin-bottom: 3px; font-size: 13px; }
+
+    /* highlight box */
+    .wiki-hatnote {
+      padding: 4px 0 4px 20px; border-left: 3px solid #a2a9b1; color: #54595d;
+      font-style: italic; font-size: 13px; margin-bottom: 12px;
+    }
+
+    /* references */
+    .wiki-refs { font-size: 12px; column-count: 2; column-gap: 20px; }
+    .wiki-refs ol { padding-left: 20px; }
+    .wiki-refs li { margin-bottom: 5px; }
+
+    /* categories */
+    .wiki-cats {
+      border-top: 1px solid #a2a9b1; padding: 8px 0; margin-top: 20px;
+      font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    }
+    .wiki-cats strong { margin-right: 6px; }
+    .wiki-cats a { background: #f8f9fa; border: 1px solid #a2a9b1; padding: 2px 8px; border-radius: 2px; color: #3366cc; font-size: 12px; }
+
+    /* sidebar */
+    .wiki-sidebar {
+      width: 190px; flex-shrink: 0; font-size: 13px;
+    }
+    .sidebar-box { border: 1px solid #a2a9b1; margin-bottom: 14px; }
+    .sidebar-box-title { background: #cee0f2; padding: 5px 8px; font-weight: bold; font-size: 12px; }
+    .sidebar-box-body { padding: 8px; }
+    .sidebar-box-body a { display: block; margin-bottom: 4px; font-size: 12px; }
+    .sidebar-lang { font-size: 11px; color: #54595d; margin-top: 6px; }
+
+    /* footer */
+    .wiki-footer {
+      background: #f8f9fa; border-top: 1px solid #a2a9b1;
+      padding: 12px 16px; font-size: 12px; color: #54595d; text-align: center;
+      margin-top: 20px;
+    }
+    .wiki-footer a { color: #3366cc; }
+
+    /* clearfix */
+    .clearfix::after { content: ''; display: table; clear: both; }
+
+    @media (max-width: 900px) {
+      .wiki-body { flex-direction: column; }
+      .wiki-sidebar { width: 100%; }
+      .wiki-infobox { float: none; width: 100%; margin: 0 0 16px 0; }
+      .wiki-cols { grid-template-columns: 1fr 1fr; }
+      .wiki-refs { column-count: 1; }
+    }
+    @media (max-width: 600px) {
+      .wiki-cols { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAVIGATION BAR -->
+<div id="wiki-header">
+  <div class="wiki-topbar">
+    <div class="wiki-logo">
+      <div class="wiki-logo-sphere">W</div>
+      <span>Wikipedia</span>
+      <span style="font-weight:normal;color:#54595d;font-size:13px">The Free Encyclopedia</span>
+    </div>
+    <div class="wiki-topbar-right">
+      <a href="#">Create account</a>
+      <a href="#">Log in</a>
+    </div>
+  </div>
+  <div class="wiki-tabs">
+    <div class="wiki-tab active">Article</div>
+    <div class="wiki-tab">Talk</div>
+    <div class="wiki-tab" style="margin-left:auto">Read</div>
+    <div class="wiki-tab">Edit</div>
+    <div class="wiki-tab">View history</div>
+  </div>
+</div>
+
+<div class="wiki-body">
+
+  <!-- SIDEBAR -->
+  <aside class="wiki-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-box-title">Navigation</div>
+      <div class="sidebar-box-body">
+        <a href="#">Main page</a>
+        <a href="#">Contents</a>
+        <a href="#">Current events</a>
+        <a href="#">Random article</a>
+        <a href="#">About Wikipedia</a>
+        <a href="#">Contact us</a>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-box-title">Contribute</div>
+      <div class="sidebar-box-body">
+        <a href="#">Help</a>
+        <a href="#">Learn to edit</a>
+        <a href="#">Community portal</a>
+        <a href="#">Recent changes</a>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-box-title">Tools</div>
+      <div class="sidebar-box-body">
+        <a href="#">What links here</a>
+        <a href="#">Related changes</a>
+        <a href="#">Special pages</a>
+        <a href="#">Permanent link</a>
+        <a href="#">Cite this page</a>
+        <a href="#">Get shortened URL</a>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-box-title">Languages</div>
+      <div class="sidebar-box-body">
+        <a href="#">Français</a>
+        <a href="#">Español</a>
+        <a href="#">Deutsch</a>
+        <a href="#">العربية</a>
+        <div class="sidebar-lang">Add links</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="wiki-main">
+
+    <h1 class="wiki-page-title">Marwane Boubekeur</h1>
+    <p class="wiki-subtitle">Data Scientist and Sport Scientist</p>
+
+    <div class="wiki-notice">
+      <div class="wiki-notice-icon">ℹ️</div>
+      <div>This article is about the French data scientist and sport scientist. For the Algerian footballer of the same name, see <a href="#">Marwane Boubekeur (footballer)</a>.</div>
+    </div>
+
+    <!-- INFOBOX -->
+    <div class="wiki-infobox">
+      <div class="infobox-title">Marwane Boubekeur</div>
+      <div class="infobox-img">👤</div>
+      <div class="infobox-caption">Marwane Boubekeur, Data &amp; Sport Scientist (2026)</div>
+      <div class="infobox-row">
+        <div class="infobox-label">Born</div>
+        <div class="infobox-value">France</div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Nationality</div>
+        <div class="infobox-value">French</div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Residence</div>
+        <div class="infobox-value">Paris, France</div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Education</div>
+        <div class="infobox-value">M.Eng. Data &amp; AI<br/><a href="#">ECE Paris</a></div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Alma mater</div>
+        <div class="infobox-value">CPGE MPSI/MP<br/>Exchange programme, London</div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Occupation</div>
+        <div class="infobox-value">Data Scientist,<br/>Sport Scientist</div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Known for</div>
+        <div class="infobox-value">ML injury prediction, Computer vision sport analytics</div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Website</div>
+        <div class="infobox-value"><a href="https://github.com/Warmvne" target="_blank">github.com/Warmvne</a></div>
+      </div>
+      <div class="infobox-row">
+        <div class="infobox-label">Status</div>
+        <div class="infobox-value"><span style="color:#2ecc71">●</span> Open to opportunities (2026)</div>
+      </div>
+    </div>
+
+    <!-- LEAD -->
+    <div class="wiki-lead clearfix">
+      <p>
+        <b>Marwane Boubekeur</b> is a French <a href="#">data scientist</a> and <a href="#">sport scientist</a> based in <a href="#">Paris</a>, specialising in <a href="#">machine learning</a> pipelines, <a href="#">computer vision</a>, and performance analytics for elite sport. He holds a Master of Engineering in Data &amp; Artificial Intelligence from <a href="#">ECE Paris</a>, preceded by preparatory classes (<a href="#">CPGE</a> MPSI/MP) and an exchange programme in London.
+      </p>
+      <p>
+        Boubekeur is primarily known for his interdisciplinary work at the intersection of sports science and data engineering, combining traditional biomechanical methodology with modern deep learning techniques. His research focuses on translating raw performance data into <a href="#">actionable decisions</a> for coaching staff and sports organisations — summarised in his personal maxim: <i>"Turning raw data into performance decisions."</i>
+      </p>
+      <p>
+        As of 2026, he is open to roles in sport science, data science, and research collaborations in performance analytics. He maintains an active open-source presence under the GitHub handle <a href="https://github.com/Warmvne" target="_blank">Warmvne</a>.
+      </p>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="wiki-toc">
+      <div class="wiki-toc-title">Contents <span style="font-weight:normal;font-size:11px">[<a href="#">hide</a>]</span></div>
+      <ol>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#research">Research and projects</a>
+          <ul class="toc-sub">
+            <li><a href="#nba">NBA load management and injury prediction</a></li>
+            <li><a href="#football-cv">Football computer vision analytics</a></li>
+            <li><a href="#basketball-cv">Basketball computer vision analytics</a></li>
+            <li><a href="#other">Other projects</a></li>
+          </ul>
+        </li>
+        <li><a href="#skills">Technical expertise</a></li>
+        <li><a href="#contact">Contact and links</a></li>
+        <li><a href="#refs">References</a></li>
+        <li><a href="#cats">See also</a></li>
+      </ol>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="wiki-section" id="education">
+      <h2 class="wiki-h2">Education <span class="edit-link">[<a href="#">edit</a>]</span></h2>
+      <p>
+        Boubekeur completed the <a href="#">Classes Préparatoires aux Grandes Écoles</a> (CPGE) in the MPSI/MP track, a competitive two-year preparatory programme in mathematics and physics that serves as a gateway to France's elite engineering schools. He subsequently enrolled at <a href="#">ECE Paris</a>, where he obtained a Master of Engineering (M.Eng.) in Data &amp; Artificial Intelligence.
+      </p>
+      <p>
+        During his studies he undertook an exchange programme in London, gaining international exposure to the British academic tradition and sport science ecosystem — particularly relevant to his later focus on elite performance analytics.
+      </p>
+    </div>
+
+    <!-- RESEARCH -->
+    <div class="wiki-section" id="research">
+      <h2 class="wiki-h2">Research and projects <span class="edit-link">[<a href="#">edit</a>]</span></h2>
+      <p>
+        Boubekeur's project portfolio centres on end-to-end <a href="#">machine learning</a> and <a href="#">computer vision</a> systems applied to professional sport. The following table summarises his principal published works.
+      </p>
+
+      <table class="wiki-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Project</th>
+            <th>Domain</th>
+            <th>Key result</th>
+            <th>Repository</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>01</td>
+            <td>NBA Load Management — Injury Risk Prediction</td>
+            <td>Machine Learning · Sports Science</td>
+            <td><span class="metric">AUC 0.76</span>, 3 risk tiers</td>
+            <td><a href="https://github.com/Warmvne/NBA-Project" target="_blank">NBA-Project</a></td>
+          </tr>
+          <tr>
+            <td>02</td>
+            <td>Football Computer Vision Analytics</td>
+            <td>Computer Vision · Football</td>
+            <td>YOLOv8 + ByteTrack, Voronoi space control</td>
+            <td><a href="https://github.com/Warmvne/Football_ComputerVision" target="_blank">Football_ComputerVision</a></td>
+          </tr>
+          <tr>
+            <td>03</td>
+            <td>Basketball Computer Vision Analytics</td>
+            <td>Computer Vision · Basketball</td>
+            <td>BEEF biomechanics, R3D-18 action recognition</td>
+            <td><a href="https://github.com/Warmvne/Basketball_ComputerVision" target="_blank">Basketball_ComputerVision</a></td>
+          </tr>
+          <tr>
+            <td>04</td>
+            <td>Sport Scientist Curriculum</td>
+            <td>Education · Open Source</td>
+            <td>37 notebooks, 6-month curriculum</td>
+            <td><a href="https://github.com/Warmvne/SportScientist-Curriculum" target="_blank">SportScientist-Curriculum</a></td>
+          </tr>
+          <tr>
+            <td>05</td>
+            <td>BrainBridge</td>
+            <td>Chrome Extension · JS</td>
+            <td>AI wait-time mini-games</td>
+            <td><a href="https://github.com/Warmvne/BrainBridge" target="_blank">BrainBridge</a></td>
+          </tr>
+          <tr>
+            <td>06</td>
+            <td>Acoustic Person Localization</td>
+            <td>Hackathon · Signal Processing</td>
+            <td>RIR-based indoor positioning</td>
+            <td><a href="https://github.com/Warmvne/ia_data_hack_acoustic" target="_blank">ia_data_hack_acoustic</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- NBA -->
+      <h3 class="wiki-h3" id="nba">NBA load management and injury prediction <span class="edit-link">[<a href="#">edit</a>]</span></h3>
+      <div class="wiki-hatnote">Main article: <a href="https://github.com/Warmvne/NBA-Project" target="_blank">NBA-Project (GitHub)</a></div>
+      <p>
+        Boubekeur's most cited work is an end-to-end <a href="#">machine learning pipeline</a> for predicting individual <a href="#">NBA</a> player injury risk from historical workload and advanced performance data. The system uses a temporal train/test split to respect chronological data ordering, preventing <a href="#">data leakage</a>. Over 18 engineered features were derived from raw game logs, including <a href="#">acute-to-chronic workload ratios</a> (ACWR), rolling averages, and minute-per-game trajectories.
+      </p>
+      <p>
+        The best-performing model — a <a href="#">Gradient Boosting</a> classifier — achieved an <a href="#">Area Under the ROC Curve</a> (AUC) of <b>0.76</b>. Predictions are binned into three actionable tiers:
+      </p>
+      <ul style="padding-left:24px;margin-bottom:12px;font-size:13px;">
+        <li><b>High risk</b> (score ≥ 0.55): recommended rest</li>
+        <li><b>Medium risk</b> (0.35–0.55): enhanced monitoring</li>
+        <li><b>Low risk</b> (&lt; 0.35): cleared to play</li>
+      </ul>
+      <p>
+        <a href="#">SHAP</a> (SHapley Additive exPlanations) values were used to ensure model interpretability, allowing coaching staff to understand which factors contributed to a given player's risk classification. The project is reproducible via a public <a href="https://colab.research.google.com/github/Warmvne/NBA-Project/blob/main/LOAD_MANAGEMENT_NBA.ipynb" target="_blank">Google Colab notebook</a>.
+      </p>
+      <p>
+        Stack: <span class="wiki-tag">Python</span> <span class="wiki-tag">XGBoost</span> <span class="wiki-tag">SHAP</span> <span class="wiki-tag">Temporal CV</span> <span class="wiki-tag">pandas</span> <span class="wiki-tag">scikit-learn</span>
+      </p>
+
+      <!-- FOOTBALL CV -->
+      <h3 class="wiki-h3" id="football-cv">Football computer vision analytics <span class="edit-link">[<a href="#">edit</a>]</span></h3>
+      <div class="wiki-hatnote">Main article: <a href="https://github.com/Warmvne/Football_ComputerVision" target="_blank">Football_ComputerVision (GitHub)</a></div>
+      <p>
+        This project constitutes a full <a href="#">computer vision</a> pipeline applied to association football. Player and ball detection is performed with <a href="#">YOLOv8</a>, while multi-object tracking across frames uses the <a href="#">ByteTrack</a> algorithm. A bird's-eye-view projection is achieved through <a href="#">homography estimation</a>, mapping pitch coordinates from broadcast camera angle to a top-down tactical view.
+      </p>
+      <p>
+        <a href="#">Voronoi diagrams</a> are computed on the projected player positions to quantify territorial space control for each team. Additionally, the pipeline includes automated formation detection and action recognition via the <a href="#">R3D-18</a> 3D convolutional network architecture. Biomechanical shooting analysis is carried out with <a href="#">MediaPipe</a> pose estimation, examining joint angles and kinetic chain sequencing.
+      </p>
+      <p>
+        Stack: <span class="wiki-tag">YOLOv8</span> <span class="wiki-tag">ByteTrack</span> <span class="wiki-tag">OpenCV</span> <span class="wiki-tag">MediaPipe</span> <span class="wiki-tag">R3D-18</span> <span class="wiki-tag">Homography</span>
+      </p>
+
+      <!-- BASKETBALL CV -->
+      <h3 class="wiki-h3" id="basketball-cv">Basketball computer vision analytics <span class="edit-link">[<a href="#">edit</a>]</span></h3>
+      <div class="wiki-hatnote">Main article: <a href="https://github.com/Warmvne/Basketball_ComputerVision" target="_blank">Basketball_ComputerVision (GitHub)</a></div>
+      <p>
+        The basketball CV system adapts and extends the football pipeline to NBA analysis. Shooting mechanics are evaluated via <a href="#">MediaPipe</a> using the <b>BEEF principle</b> (Balance, Eyes, Elbow, Follow-through), with automated measurement of elbow angle and knee valgus during the shooting motion.
+      </p>
+      <p>
+        Offensive spacing is quantified through a composite score derived from <a href="#">Voronoi area</a> and <a href="#">convex hull</a> computations on player positions. Ball movement patterns are modelled as directed graphs using <a href="#">NetworkX</a>, enabling the identification of <a href="#">passing networks</a> and playmaking tendencies. Seven distinct action classes (pick-and-roll, isolation, transition, etc.) are recognised using an R3D-18 classifier trained on curated video clips.
+      </p>
+      <p>
+        Stack: <span class="wiki-tag">YOLOv8</span> <span class="wiki-tag">MediaPipe</span> <span class="wiki-tag">R3D-18</span> <span class="wiki-tag">NetworkX</span> <span class="wiki-tag">scipy</span> <span class="wiki-tag">nba_api</span>
+      </p>
+
+      <!-- OTHER -->
+      <h3 class="wiki-h3" id="other">Other projects <span class="edit-link">[<a href="#">edit</a>]</span></h3>
+      <p>
+        <b>Sport Scientist Curriculum</b> is an open-source, self-directed learning resource comprising a six-month programme across statistics, machine learning theory, Python, R, football analytics (including <a href="#">StatsBomb</a> data and expected goals modelling), and basketball analytics (NBA advanced metrics, tracking data). The curriculum consists of 37 Jupyter notebooks, each with exercises and worked solutions.
+      </p>
+      <p>
+        <b>BrainBridge</b> is a <a href="#">Chrome extension</a> that intercepts API requests to AI services and launches brief cognitive mini-games during the resultant wait period, reducing idle time and improving perceived responsiveness of AI-powered tools.
+      </p>
+      <p>
+        <b>Acoustic Person Localization</b> was developed during a hackathon. It applies signal processing and deep learning to indoor person localization using <a href="#">Room Impulse Responses</a> (RIRs) from microphone arrays.
+      </p>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="wiki-section" id="skills">
+      <h2 class="wiki-h2">Technical expertise <span class="edit-link">[<a href="#">edit</a>]</span></h2>
+      <p>Boubekeur's skill set spans the full data-to-decision stack, from raw data ingestion and warehousing to deployed inference pipelines and interactive visualisations.</p>
+
+      <h3 class="wiki-h3">Machine learning and statistical modelling</h3>
+      <p>Core methods include <a href="#">gradient boosting</a> (XGBoost), <a href="#">random forests</a>, temporal cross-validation, SHAP interpretability, <a href="#">survival analysis</a> (Cox Proportional Hazards), unsupervised clustering (K-Means, DBSCAN), and dimensionality reduction (PCA, UMAP).</p>
+
+      <h3 class="wiki-h3">Computer vision</h3>
+      <p><a href="#">YOLOv8</a> for object detection and tracking, ByteTrack for multi-object tracking, <a href="#">MediaPipe</a> for pose estimation, homography and perspective transforms, <a href="#">R3D-18</a> for 3D action recognition, and Farneback <a href="#">optical flow</a>.</p>
+
+      <h3 class="wiki-h3">Sports analytics</h3>
+      <p>Load management and <a href="#">ACWR</a> modelling, expected goals (xG) model development with <a href="#">StatsBomb</a> data, NBA advanced metrics (BPM, WS, RAPTOR), GPS and wearable data analysis, player profiling and similarity tools, tactical analysis through Voronoi decomposition and formation detection.</p>
+
+      <h3 class="wiki-h3">Data engineering and infrastructure</h3>
+      <div class="wiki-cols">
+        <div class="wiki-col">
+          <ul>
+            <li><a href="#">dbt</a> — data transformation</li>
+            <li><a href="#">Snowflake</a> — cloud data warehouse</li>
+            <li>AWS S3 — object storage</li>
+            <li>Azure Databricks &amp; Delta Lake</li>
+          </ul>
+        </div>
+        <div class="wiki-col">
+          <ul>
+            <li>Data Vault architecture</li>
+            <li>Pipeline automation (SQL + Python)</li>
+            <li>Docker · Git · CI/CD</li>
+          </ul>
+        </div>
+        <div class="wiki-col">
+          <ul>
+            <li>Power BI (DAX, dashboards)</li>
+            <li>MicroStrategy semantic layer</li>
+            <li>Plotly · mplsoccer · ggplot2</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 class="wiki-h3">Programming languages</h3>
+      <p>Python (pandas, scikit-learn, PyTorch), R (tidyverse, lme4, ggplot2), SQL (advanced queries and modelling), JavaScript (Chrome Extensions API). English proficiency certified at TOEIC 915/990.</p>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="wiki-section" id="contact">
+      <h2 class="wiki-h2">Contact and links <span class="edit-link">[<a href="#">edit</a>]</span></h2>
+      <p>
+        Boubekeur can be contacted at <a href="mailto:marwane.boubekeur@gmail.com">marwane.boubekeur@gmail.com</a>. He maintains an active GitHub profile at <a href="https://github.com/Warmvne" target="_blank">github.com/Warmvne</a> and a LinkedIn page. A curriculum vitae is available for download upon request.
+      </p>
+    </div>
+
+    <!-- REFERENCES -->
+    <div class="wiki-section" id="refs">
+      <h2 class="wiki-h2">References <span class="edit-link">[<a href="#">edit</a>]</span></h2>
+      <div class="wiki-refs">
+        <ol>
+          <li>Boubekeur, M. (2025). <i>NBA Load Management — Injury Risk Prediction</i>. GitHub. <a href="https://github.com/Warmvne/NBA-Project" target="_blank">github.com/Warmvne/NBA-Project</a></li>
+          <li>Boubekeur, M. (2025). <i>Football Computer Vision Analytics</i>. GitHub. <a href="https://github.com/Warmvne/Football_ComputerVision" target="_blank">github.com/Warmvne/Football_ComputerVision</a></li>
+          <li>Boubekeur, M. (2025). <i>Basketball Computer Vision Analytics</i>. GitHub. <a href="https://github.com/Warmvne/Basketball_ComputerVision" target="_blank">github.com/Warmvne/Basketball_ComputerVision</a></li>
+          <li>Boubekeur, M. (2024). <i>Sport Scientist Curriculum</i>. GitHub. <a href="https://github.com/Warmvne/SportScientist-Curriculum" target="_blank">github.com/Warmvne/SportScientist-Curriculum</a></li>
+          <li>Boubekeur, M. (2024). <i>BrainBridge Chrome Extension</i>. GitHub. <a href="https://github.com/Warmvne/BrainBridge" target="_blank">github.com/Warmvne/BrainBridge</a></li>
+          <li>Boubekeur, M. (2024). <i>Acoustic Person Localization (Hackathon)</i>. GitHub. <a href="https://github.com/Warmvne/ia_data_hack_acoustic" target="_blank">github.com/Warmvne/ia_data_hack_acoustic</a></li>
+          <li>ECE Paris. (2026). <i>Master of Engineering — Data &amp; Artificial Intelligence</i>. ECE Paris Official Website.</li>
+          <li>Lundberg, S. M., &amp; Lee, S.-I. (2017). A unified approach to interpreting model predictions. <i>Advances in Neural Information Processing Systems</i>, 30. [SHAP methodology]</li>
+          <li>Zhang, Y., et al. (2022). ByteTrack: Multi-object tracking by associating every detection box. <i>ECCV 2022</i>. [ByteTrack algorithm used in CV projects]</li>
+          <li>StatsBomb. (2023). <i>Open Data</i>. StatsBomb Services Ltd. [data source for xG modelling]</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- SEE ALSO / CATEGORIES -->
+    <div class="wiki-section" id="cats">
+      <h2 class="wiki-h2">See also <span class="edit-link">[<a href="#">edit</a>]</span></h2>
+      <ul style="padding-left:24px;font-size:13px;margin-bottom:16px;">
+        <li><a href="#">Sports analytics</a></li>
+        <li><a href="#">Machine learning in sport</a></li>
+        <li><a href="#">Computer vision</a></li>
+        <li><a href="#">Load management (sport)</a></li>
+        <li><a href="#">Expected goals (football)</a></li>
+        <li><a href="#">ECE Paris</a></li>
+      </ul>
+    </div>
+
+    <div class="wiki-cats">
+      <strong>Categories:</strong>
+      <a href="#">French data scientists</a>
+      <a href="#">Sport scientists</a>
+      <a href="#">Machine learning researchers</a>
+      <a href="#">Computer vision</a>
+      <a href="#">Sports analytics</a>
+      <a href="#">ECE Paris alumni</a>
+      <a href="#">Python programmers</a>
+      <a href="#">Open-source contributors</a>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<div class="wiki-footer">
+  <p>This page was last edited on 23 June 2026, at 00:00 (UTC). Text is available under the <a href="#">Creative Commons Attribution-ShareAlike License 4.0</a>; additional terms may apply.</p>
+  <p style="margin-top:6px;">
+    <a href="#">Privacy policy</a> · <a href="#">About Wikipedia</a> · <a href="#">Disclaimers</a> · <a href="#">Contact Wikipedia</a> · <a href="#">Code of conduct</a> · <a href="#">Mobile view</a>
+  </p>
+</div>
+
+</body>
+</html>

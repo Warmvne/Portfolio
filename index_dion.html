@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marwane Boubekeur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:    #101010;
+      --bg2:   #161616;
+      --bg3:   #1c1c1c;
+      --mint:  #c5f0c9;
+      --mintd: rgba(197,240,201,.10);
+      --dim:   rgba(197,240,201,.45);
+      --border:rgba(197,240,201,.14);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      background: var(--bg); color: var(--mint);
+      font-family: 'Inter', sans-serif; font-size: 16px;
+      -webkit-font-smoothing: antialiased; scroll-behavior: smooth;
+    }
+    body { background: var(--bg); overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; cursor: pointer; }
+    ::selection { background: #ff3d00; color: var(--mint); }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 999;
+      background: var(--mint); transform-origin: left;
+      animation: load 1.6s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes load { 0%{transform:scaleX(0);opacity:1} 85%{transform:scaleX(1);opacity:1} 100%{transform:scaleX(1);opacity:0} }
+
+    /* ── CANVAS ── */
+    canvas#bg { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+
+    /* ── MAIN ── */
+    main { position:relative; z-index:2; pointer-events:none; }
+    main a, main button, main section { pointer-events:auto; }
+
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    #hero {
+      position:relative; height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:10rem;
+    }
+    .hero-name {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(72px,13vw,17rem);
+      line-height:.85; letter-spacing:-.01em;
+      text-transform:uppercase; color:var(--mint);
+      white-space:nowrap; text-align:center; user-select:none;
+      /* hero entrance */
+      animation: heroIn 1.2s cubic-bezier(.215,.61,.355,1) .3s both;
+    }
+    @keyframes heroIn { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:none} }
+
+    .hero-footer {
+      position:absolute; bottom:4rem; left:6rem;
+      width:calc(100% - 12rem);
+      display:flex; justify-content:space-between; align-items:flex-end;
+      pointer-events:auto;
+      animation: heroIn 1s cubic-bezier(.215,.61,.355,1) .7s both;
+    }
+    .hero-footer-left { display:flex; gap:2.5rem; align-items:flex-end; }
+    .hf-link {
+      position:relative; padding-bottom:2px;
+      font-size:1rem; font-weight:400; color:var(--mint);
+    }
+    .hf-link::after {
+      content:''; position:absolute; bottom:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .45s cubic-bezier(.215,.61,.355,1);
+    }
+    .hf-link:hover::after { transform:scaleX(1); }
+    .hero-footer-center { text-align:center; }
+    .hero-footer-right  { text-align:right; }
+    .fl { font-size:1rem; font-weight:400; display:block; line-height:1.3; }
+    .fs { font-size:.85rem; color:var(--dim); display:block; line-height:1.4; margin-top:2px; }
+    .avail-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:#22c55e; margin-right:5px; animation:blink 2s infinite; vertical-align:middle; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ══════════════════════════════════
+       SCROLL REVEAL SYSTEM
+    ══════════════════════════════════ */
+    .sr {
+      opacity:0;
+      transform:translateY(60px);
+      transition:
+        opacity .85s cubic-bezier(.215,.61,.355,1),
+        transform .85s cubic-bezier(.215,.61,.355,1);
+    }
+    .sr.on { opacity:1; transform:none; }
+
+    .sr-left {
+      opacity:0;
+      transform:translateX(-50px);
+      transition:
+        opacity .8s cubic-bezier(.215,.61,.355,1),
+        transform .8s cubic-bezier(.215,.61,.355,1);
+    }
+    .sr-left.on { opacity:1; transform:none; }
+
+    .sr-right {
+      opacity:0;
+      transform:translateX(50px);
+      transition:
+        opacity .8s cubic-bezier(.215,.61,.355,1),
+        transform .8s cubic-bezier(.215,.61,.355,1);
+    }
+    .sr-right.on { opacity:1; transform:none; }
+
+    /* ══════════════════════════════════
+       SECTION HEADER
+    ══════════════════════════════════ */
+    .sec-header { margin-bottom:5rem; }
+    .sec-eyebrow {
+      display:inline-flex; align-items:center; gap:.7rem;
+      font-size:.72rem; font-weight:500; letter-spacing:.18em;
+      text-transform:uppercase; color:var(--mint); opacity:.5;
+      margin-bottom:1rem;
+    }
+    .sec-eyebrow::before {
+      content:''; display:block; width:28px; height:1px; background:var(--mint); opacity:.6;
+    }
+    .sec-title {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(3.5rem,7vw,8rem);
+      line-height:.88; letter-spacing:-.01em;
+      text-transform:uppercase; color:var(--mint);
+    }
+    /* keep old .sec-label for compatibility */
+    .sec-label {
+      font-size:.8rem; font-weight:400; letter-spacing:.14em;
+      text-transform:uppercase; color:var(--dim);
+      width:fit-content; margin:0 auto 4rem;
+    }
+
+    /* ══════════════════════════════════
+       WORKS
+    ══════════════════════════════════ */
+    #works { padding:0 7.5rem; margin-bottom:4rem; }
+
+    .project-list { list-style:none; }
+
+    /* ── single project row ── */
+    .project-item {
+      display:block;
+      position:relative;
+      padding:5.5rem 0;
+      color:var(--mint);
+      /* border reveal */
+    }
+    .project-item::before {
+      content:''; position:absolute; top:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .8s cubic-bezier(.215,.61,.355,1);
+    }
+    .project-item.border-on::before { transform:scaleX(1); }
+    .project-item:last-of-type::after {
+      content:''; position:absolute; bottom:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .8s cubic-bezier(.215,.61,.355,1) .1s;
+    }
+    .project-item:last-of-type.border-on::after { transform:scaleX(1); }
+
+    /* two-column grid: illustration left, text right */
+    .project-grid {
+      display:grid;
+      grid-template-columns:42% 1fr;
+      gap:5%;
+      align-items:center;
+    }
+    .project-grid.reverse { grid-template-columns:1fr 42%; }
+    .project-grid.reverse .project-thumb { order:2; }
+    .project-grid.reverse .project-body  { order:1; }
+
+    /* thumbnail */
+    .project-thumb {
+      position:relative;
+      border-radius:6px;
+      overflow:hidden;
+      box-shadow:0 0 0 1px var(--border);
+      transition:box-shadow .5s ease, transform .5s cubic-bezier(.215,.61,.355,1);
+    }
+    .project-item:hover .project-thumb {
+      box-shadow:0 16px 56px rgba(197,240,201,.12), 0 0 0 1px rgba(197,240,201,.4);
+      transform:translateY(-4px);
+    }
+    .project-thumb svg { display:block; width:100%; height:auto; }
+
+    /* body */
+    .project-body {
+      display:flex; flex-direction:column; gap:1.6rem;
+    }
+    .project-meta {
+      display:flex; align-items:center; gap:.9rem;
+    }
+    .project-num  { font-size:.75rem; color:var(--dim); font-variant-numeric:tabular-nums; letter-spacing:.06em; }
+    .project-type { font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); border:1px solid var(--border); padding:3px 10px; border-radius:3px; }
+
+    .project-title {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(2.8rem,5.5vw,6.5rem);
+      line-height:.85; letter-spacing:-.01em;
+      text-transform:uppercase; color:var(--mint);
+      transition:letter-spacing .4s ease;
+    }
+    .project-item:hover .project-title { letter-spacing:.015em; }
+
+    .project-desc {
+      font-size:.9rem; color:var(--dim); line-height:1.75;
+      max-width:500px; font-weight:300;
+    }
+
+    /* metrics row */
+    .project-metrics {
+      display:flex; gap:2rem;
+    }
+    .pm { display:flex; flex-direction:column; gap:.2rem; }
+    .pm-val { font-family:'Bebas Neue',Impact,sans-serif; font-size:2.4rem; line-height:1; color:var(--mint); letter-spacing:-.01em; }
+    .pm-lbl { font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); }
+
+    /* tech tags */
+    .project-tags { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .ptag {
+      font-size:.7rem; font-family:'Inter',sans-serif;
+      color:var(--dim); border:1px solid var(--border);
+      padding:3px 10px; border-radius:3px; letter-spacing:.03em;
+      transition:border-color .25s, color .25s;
+    }
+    .project-item:hover .ptag { border-color:rgba(197,240,201,.3); color:var(--mint); }
+
+    /* github link */
+    .project-gh {
+      display:inline-flex; align-items:center; gap:.5rem;
+      font-size:.8rem; color:var(--dim); letter-spacing:.04em;
+      transition:color .25s;
+      width:fit-content;
+    }
+    .project-gh svg { width:14px; height:14px; }
+    .project-item:hover .project-gh { color:var(--mint); }
+    .project-gh::after {
+      content:''; display:block; height:1px; width:0;
+      background:var(--mint); margin-top:1px;
+      transition:width .4s cubic-bezier(.215,.61,.355,1);
+    }
+    .project-item:hover .project-gh::after { width:100%; }
+
+    /* ══════════════════════════════════
+       EMOJI PARTICLES (hero)
+    ══════════════════════════════════ */
+    #emoji-bg {
+      position:absolute; inset:0;
+      pointer-events:none; overflow:hidden; z-index:0;
+    }
+    .ep {
+      position:absolute;
+      pointer-events:auto;
+      cursor:pointer;
+      user-select:none;
+      will-change:left, top;
+      line-height:1;
+      transition:filter .2s;
+    }
+    .ep:hover { filter:brightness(1.5) drop-shadow(0 0 8px rgba(197,240,201,.6)); }
+    .ep.pop {
+      animation:epop .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes epop {
+      0%{transform:scale(1)} 50%{transform:scale(1.7)} 100%{transform:scale(1)}
+    }
+
+    /* ══════════════════════════════════
+       SKILLS
+    ══════════════════════════════════ */
+    #skills { padding:9rem 7.5rem; }
+    .skills-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem;
+    }
+    .skill-card {
+      padding:2.4rem 2rem;
+      border:1px solid var(--border); border-radius:8px;
+      transition:background .35s, border-color .35s, transform .35s;
+      display:flex; flex-direction:column; gap:1.4rem;
+    }
+    .skill-card:hover {
+      background:var(--mintd);
+      border-color:rgba(197,240,201,.4);
+      transform:translateY(-5px);
+    }
+    .sk-header { display:flex; align-items:center; gap:1rem; }
+    .sk-icon { font-size:1.8rem; line-height:1; flex-shrink:0; }
+    .sk-title {
+      font-size:.95rem; font-weight:600; letter-spacing:.01em;
+      color:var(--mint); line-height:1.2;
+    }
+    .sk-pills { display:flex; flex-wrap:wrap; gap:.45rem; }
+    .sk-pill {
+      font-size:.72rem; font-family:'Inter',sans-serif;
+      padding:4px 11px; border-radius:100px;
+      border:1px solid var(--border); color:var(--dim);
+      transition:border-color .25s, color .25s, background .25s;
+    }
+    .skill-card:hover .sk-pill {
+      border-color:rgba(197,240,201,.32); color:var(--mint);
+    }
+    .sk-pill.highlight {
+      background:rgba(197,240,201,.12);
+      border-color:rgba(197,240,201,.4); color:var(--mint);
+    }
+
+    /* ══════════════════════════════════
+       CONTACT
+    ══════════════════════════════════ */
+    #contact {
+      padding:8rem 7.5rem 10rem;
+      border-top:1px solid var(--border);
+      display:flex; flex-direction:column; align-items:center;
+      gap:3.5rem; text-align:center;
+    }
+    .contact-heading {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(3.5rem,8vw,10rem);
+      line-height:.85; text-transform:uppercase; letter-spacing:-.01em;
+    }
+    .contact-heading span { opacity:.3; }
+    .contact-btn {
+      display:inline-flex; align-items:center; gap:.9rem;
+      padding:1.1rem 2.6rem; border:1px solid rgba(197,240,201,.3);
+      border-radius:4px; font-size:.95rem; font-weight:500;
+      color:var(--mint); letter-spacing:.06em; text-transform:uppercase;
+      transition:background .3s, border-color .3s, box-shadow .3s, transform .3s;
+    }
+    .contact-btn:hover {
+      background:var(--mintd); border-color:var(--mint);
+      box-shadow:0 0 32px rgba(197,240,201,.1);
+      transform:translateY(-2px);
+    }
+    .contact-btn svg { width:20px; height:20px; }
+
+    .contact-links { display:flex; gap:2rem; flex-wrap:wrap; justify-content:center; }
+    .contact-link {
+      font-size:.9rem; color:var(--dim);
+      display:flex; align-items:center; gap:.5rem;
+      position:relative; padding-bottom:2px;
+      transition:color .25s;
+    }
+    .contact-link::after {
+      content:''; position:absolute; bottom:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .35s cubic-bezier(.215,.61,.355,1);
+    }
+    .contact-link:hover { color:var(--mint); }
+    .contact-link:hover::after { transform:scaleX(1); }
+    .contact-link svg { width:15px; height:15px; }
+
+    .footer-copy { font-size:.78rem; color:var(--mint); opacity:.2; font-weight:300; }
+
+    /* ══════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════ */
+    @media(max-width:1100px) {
+      #works,#skills,#contact { padding-left:4rem; padding-right:4rem; }
+      .project-title { font-size:clamp(2.4rem,5vw,4.5rem); }
+    }
+    @media(max-width:860px) {
+      .hero-name { font-size:clamp(56px,15vw,110px); }
+      .hero-footer { left:2rem; width:calc(100% - 4rem); bottom:2.5rem; }
+      .hero-footer-center,.hero-footer-right { display:none; }
+      #works,#skills,#contact { padding-left:1.8rem; padding-right:1.8rem; }
+      .project-grid,.project-grid.reverse { grid-template-columns:1fr; }
+      .project-grid.reverse .project-thumb { order:0; }
+      .project-grid.reverse .project-body  { order:0; }
+      .project-item { padding:3.5rem 0; }
+      .skills-grid { grid-template-columns:1fr 1fr; }
+    }
+    @media(max-width:560px) {
+      .skills-grid { grid-template-columns:1fr; }
+      .project-metrics { gap:1.2rem; }
+      .contact-links { gap:1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loader"></div>
+<canvas id="bg"></canvas>
+
+<main>
+
+<!-- ══════════════════════════════════
+     HERO
+══════════════════════════════════ -->
+<section id="hero">
+  <div id="emoji-bg"></div>
+  <h1 class="hero-name" style="position:relative;z-index:1">Marwane<br/>Boubekeur</h1>
+  <div class="hero-footer">
+    <div class="hero-footer-left">
+      <a href="#works"   class="hf-link">Works</a>
+      <a href="#skills"  class="hf-link">Skills</a>
+      <a href="#contact" class="hf-link">Contact</a>
+    </div>
+    <div class="hero-footer-center">
+      <span class="fl">Data &amp; Sport Scientist</span>
+      <span class="fs"><span class="avail-dot"></span>Available from 2026</span>
+    </div>
+    <div class="hero-footer-right">
+      <span class="fl">M.Eng. Data &amp; AI — ECE Paris</span>
+      <span class="fs">Paris, France</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     WORKS
+══════════════════════════════════ -->
+<section id="works">
+  <div class="sec-header sr">
+    <p class="sec-eyebrow">Selected Projects</p>
+    <h2 class="sec-title">Works</h2>
+  </div>
+  <ul class="project-list">
+
+    <!-- ── 01 NBA ── -->
+    <li class="project-item">
+      <div class="project-grid">
+        <div class="project-thumb sr-left">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#0a1a10;display:block">
+            <!-- background grid -->
+            <defs>
+              <pattern id="grid1" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(197,240,201,.05)" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="480" height="320" fill="url(#grid1)"/>
+
+            <!-- ── ROC CURVE ── -->
+            <text x="30" y="24" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">ROC CURVE — GRADIENT BOOSTING</text>
+            <!-- axes -->
+            <line x1="50" y1="36" x2="50" y2="210" stroke="rgba(197,240,201,.2)" stroke-width="1"/>
+            <line x1="50" y1="210" x2="260" y2="210" stroke="rgba(197,240,201,.2)" stroke-width="1"/>
+            <!-- diagonal ref -->
+            <line x1="50" y1="210" x2="260" y2="36" stroke="rgba(197,240,201,.12)" stroke-dasharray="5,4" stroke-width="1"/>
+            <!-- ROC fill -->
+            <polygon points="50,210 76,175 100,145 122,118 148,96 172,78 196,63 222,51 244,40 260,36 260,210"
+              fill="rgba(197,240,201,.07)"/>
+            <!-- ROC line -->
+            <polyline points="50,210 76,175 100,145 122,118 148,96 172,78 196,63 222,51 244,40 260,36"
+              fill="none" stroke="#c5f0c9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- dots on curve -->
+            <circle cx="148" cy="96" r="4" fill="#c5f0c9" opacity=".8"/>
+            <circle cx="196" cy="63" r="4" fill="#c5f0c9" opacity=".8"/>
+            <!-- AUC badge -->
+            <rect x="160" y="168" width="90" height="26" rx="4" fill="#0d201a" stroke="rgba(197,240,201,.3)"/>
+            <text x="205" y="184" font-size="11" fill="#c5f0c9" text-anchor="middle" font-family="monospace">AUC = 0.76</text>
+            <!-- axis labels -->
+            <text x="155" y="226" font-size="8" fill="#c5f0c9" text-anchor="middle" opacity=".3">False Positive Rate</text>
+            <text x="22" y="124" font-size="8" fill="#c5f0c9" text-anchor="middle" opacity=".3" transform="rotate(-90,22,124)">True Positive Rate</text>
+
+            <!-- ── RISK TIERS (right side) ── -->
+            <text x="290" y="24" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">RISK TIERS</text>
+            <!-- HIGH -->
+            <rect x="290" y="36" width="168" height="52" rx="4" fill="rgba(231,76,60,.12)" stroke="rgba(231,76,60,.4)"/>
+            <text x="306" y="58" font-size="11" fill="#e74c3c" font-weight="600">HIGH RISK  ≥ 0.55</text>
+            <text x="306" y="76" font-size="9" fill="#e74c3c" opacity=".7">→ Recommended rest</text>
+            <rect x="420" y="52" width="28" height="6" rx="3" fill="#e74c3c" opacity=".7"/>
+            <!-- MED -->
+            <rect x="290" y="98" width="168" height="52" rx="4" fill="rgba(243,156,18,.10)" stroke="rgba(243,156,18,.35)"/>
+            <text x="306" y="120" font-size="11" fill="#f39c12" font-weight="600">MEDIUM  0.35 – 0.55</text>
+            <text x="306" y="138" font-size="9" fill="#f39c12" opacity=".7">→ Enhanced monitoring</text>
+            <rect x="420" y="114" width="20" height="6" rx="3" fill="#f39c12" opacity=".7"/>
+            <!-- LOW -->
+            <rect x="290" y="160" width="168" height="52" rx="4" fill="rgba(197,240,201,.07)" stroke="rgba(197,240,201,.25)"/>
+            <text x="306" y="182" font-size="11" fill="#c5f0c9" font-weight="600">LOW RISK   &lt; 0.35</text>
+            <text x="306" y="200" font-size="9" fill="#c5f0c9" opacity=".7">→ Cleared to play</text>
+            <rect x="420" y="176" width="34" height="6" rx="3" fill="#c5f0c9" opacity=".5"/>
+
+            <!-- ── FEATURE IMPORTANCE BAR CHART ── -->
+            <text x="30" y="248" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">TOP SHAP FEATURES</text>
+            <!-- bars -->
+            <g font-size="8" fill="#c5f0c9" opacity=".5" font-family="monospace">
+              <text x="30"  y="268">ACWR</text>
+              <text x="30"  y="284">Minutes/game</text>
+              <text x="30"  y="300">Age</text>
+              <text x="30"  y="316">Days rest</text>
+            </g>
+            <rect x="115" y="258" width="148" height="8" rx="2" fill="rgba(197,240,201,.6)"/>
+            <rect x="115" y="274" width="110" height="8" rx="2" fill="rgba(197,240,201,.45)"/>
+            <rect x="115" y="290" width="80"  height="8" rx="2" fill="rgba(197,240,201,.3)"/>
+            <rect x="115" y="306" width="58"  height="8" rx="2" fill="rgba(197,240,201,.22)"/>
+            <text x="270" y="266" font-size="8" fill="#c5f0c9" opacity=".5" font-family="monospace">0.38</text>
+            <text x="232" y="282" font-size="8" fill="#c5f0c9" opacity=".5" font-family="monospace">0.28</text>
+            <text x="202" y="298" font-size="8" fill="#c5f0c9" opacity=".5" font-family="monospace">0.20</text>
+            <text x="180" y="314" font-size="8" fill="#c5f0c9" opacity=".5" font-family="monospace">0.14</text>
+
+            <!-- SHAP badge -->
+            <rect x="290" y="240" width="168" height="72" rx="4" fill="rgba(197,240,201,.04)" stroke="rgba(197,240,201,.12)"/>
+            <text x="374" y="262" font-size="9" fill="#c5f0c9" opacity=".4" text-anchor="middle" font-family="monospace">MODEL INFO</text>
+            <text x="374" y="280" font-size="10" fill="#c5f0c9" opacity=".7" text-anchor="middle">XGBoost · Temporal CV</text>
+            <text x="374" y="296" font-size="10" fill="#c5f0c9" opacity=".7" text-anchor="middle">18+ engineered features</text>
+            <text x="374" y="312" font-size="10" fill="#c5f0c9" opacity=".7" text-anchor="middle">SHAP interpretability</text>
+          </svg>
+        </div>
+        <div class="project-body sr-right">
+          <div class="project-meta sr">
+            <span class="project-num">01</span>
+            <span class="project-type">ML · Sports Science</span>
+          </div>
+          <h2 class="project-title sr">NBA Injury<br/>Risk</h2>
+          <p class="project-desc sr">
+            End-to-end machine learning pipeline predicting individual NBA player injury risk from historical workload and performance data. Uses temporal train/test split to prevent data leakage, 18+ engineered features including ACWR rolling averages, and SHAP values to give coaching staff actionable explanations — not just predictions.
+          </p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">0.76</span><span class="pm-lbl">ROC-AUC</span></div>
+            <div class="pm"><span class="pm-val">18+</span><span class="pm-lbl">Features</span></div>
+            <div class="pm"><span class="pm-val">3</span><span class="pm-lbl">Risk tiers</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">Python</span><span class="ptag">XGBoost</span>
+            <span class="ptag">SHAP</span><span class="ptag">Temporal CV</span>
+            <span class="ptag">pandas</span><span class="ptag">scikit-learn</span>
+          </div>
+          <a href="https://github.com/Warmvne/NBA-Project" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 02 Football CV ── -->
+    <li class="project-item">
+      <div class="project-grid reverse">
+        <div class="project-thumb sr-right">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#081510;display:block">
+            <defs>
+              <pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(197,240,201,.04)" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="480" height="320" fill="url(#grid2)"/>
+
+            <!-- pitch -->
+            <rect x="20" y="18" width="440" height="284" rx="3" fill="rgba(197,240,201,.02)" stroke="rgba(197,240,201,.22)" stroke-width="1.2"/>
+            <!-- halfway -->
+            <line x1="240" y1="18" x2="240" y2="302" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <circle cx="240" cy="160" r="32" fill="none" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <!-- penalty boxes -->
+            <rect x="20"  y="88" width="70" height="124" fill="none" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <rect x="390" y="88" width="70" height="124" fill="none" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <rect x="20"  y="118" width="28" height="64" fill="none" stroke="rgba(197,240,201,.1)" stroke-width=".7"/>
+            <rect x="432" y="118" width="28" height="64" fill="none" stroke="rgba(197,240,201,.1)" stroke-width=".7"/>
+
+            <!-- Voronoi A (mint) -->
+            <polygon points="20,18 120,18 96,78 56,100 20,86"     fill="rgba(197,240,201,.11)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="120,18 240,18 240,74 172,94 96,78"   fill="rgba(197,240,201,.08)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="20,86 56,100 40,170 20,185"           fill="rgba(197,240,201,.11)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="56,100 96,78 172,94 154,168 84,182 40,170" fill="rgba(197,240,201,.07)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="20,185 40,170 84,182 52,238 20,238"  fill="rgba(197,240,201,.10)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="52,238 84,182 154,168 172,94 240,74 240,210 146,246 52,238" fill="rgba(197,240,201,.06)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="146,246 240,210 240,302 20,302 20,238 52,238" fill="rgba(197,240,201,.09)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+
+            <!-- Voronoi B (blue) -->
+            <polygon points="240,18 350,18 336,74 280,90 240,74"  fill="rgba(100,200,255,.08)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <polygon points="350,18 460,18 460,78 400,96 336,74"  fill="rgba(100,200,255,.10)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <polygon points="280,90 336,74 400,96 386,168 320,172 240,148 240,74" fill="rgba(100,200,255,.06)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <polygon points="400,96 460,78 460,188 430,196 386,168" fill="rgba(100,200,255,.10)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <polygon points="240,148 320,172 314,242 240,242 240,210" fill="rgba(100,200,255,.07)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <polygon points="320,172 386,168 430,196 418,250 314,242" fill="rgba(100,200,255,.09)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <polygon points="418,250 460,188 460,302 240,302 240,242 314,242" fill="rgba(100,200,255,.07)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+
+            <!-- Players A -->
+            <circle cx="46"  cy="44"  r="7" fill="#c5f0c9"/>
+            <circle cx="190" cy="50"  r="7" fill="#c5f0c9"/>
+            <circle cx="84"  cy="140" r="7" fill="#c5f0c9"/>
+            <circle cx="148" cy="108" r="7" fill="#c5f0c9"/>
+            <circle cx="148" cy="180" r="7" fill="#c5f0c9"/>
+            <circle cx="30"  cy="140" r="8" fill="#c5f0c9" stroke="#081510" stroke-width="2"/>
+            <!-- jersey numbers A -->
+            <text x="46"  y="48"  font-size="7" fill="#081510" text-anchor="middle" font-weight="bold">11</text>
+            <text x="190" y="54"  font-size="7" fill="#081510" text-anchor="middle" font-weight="bold">9</text>
+            <text x="84"  y="144" font-size="7" fill="#081510" text-anchor="middle" font-weight="bold">6</text>
+            <text x="148" y="112" font-size="7" fill="#081510" text-anchor="middle" font-weight="bold">8</text>
+            <text x="148" y="184" font-size="7" fill="#081510" text-anchor="middle" font-weight="bold">7</text>
+            <text x="30"  y="144" font-size="7" fill="#081510" text-anchor="middle" font-weight="bold">1</text>
+
+            <!-- Players B -->
+            <circle cx="286" cy="50"  r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="420" cy="44"  r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="314" cy="108" r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="360" cy="140" r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="314" cy="180" r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="448" cy="140" r="8" fill="rgba(100,200,255,.9)" stroke="#081510" stroke-width="2"/>
+
+            <!-- tracking lines -->
+            <polyline points="30,140 84,140 148,108 190,50 240,160" fill="none" stroke="rgba(197,240,201,.3)" stroke-width="1" stroke-dasharray="4,3"/>
+
+            <!-- Ball -->
+            <circle cx="240" cy="160" r="6" fill="white" stroke="#081510" stroke-width="1.5"/>
+
+            <!-- overlay labels -->
+            <text x="240" y="314" font-size="8" fill="#c5f0c9" text-anchor="middle" opacity=".35" font-family="monospace">YOLOv8 + ByteTrack · Bird's Eye View · Voronoi Space Control</text>
+          </svg>
+        </div>
+        <div class="project-body sr-left">
+          <div class="project-meta sr">
+            <span class="project-num">02</span>
+            <span class="project-type">Computer Vision · Football</span>
+          </div>
+          <h2 class="project-title sr">Football<br/>Vision</h2>
+          <p class="project-desc sr">
+            Full computer vision pipeline for association football: player and ball detection with YOLOv8, multi-object tracking via ByteTrack, homography-based bird's-eye view, Voronoi space control, automated formation detection, R3D-18 action recognition, and biomechanical shooting analysis with MediaPipe pose estimation.
+          </p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">52%</span><span class="pm-lbl">Space ctrl</span></div>
+            <div class="pm"><span class="pm-val">7</span><span class="pm-lbl">Actions</span></div>
+            <div class="pm"><span class="pm-val">RT</span><span class="pm-lbl">Tracking</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">YOLOv8</span><span class="ptag">ByteTrack</span>
+            <span class="ptag">OpenCV</span><span class="ptag">MediaPipe</span>
+            <span class="ptag">R3D-18</span><span class="ptag">Homography</span>
+          </div>
+          <a href="https://github.com/Warmvne/Football_ComputerVision" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 03 Basketball CV ── -->
+    <li class="project-item">
+      <div class="project-grid">
+        <div class="project-thumb sr-left">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#080e12;display:block">
+            <defs>
+              <!-- heatmap gradient for paint area -->
+              <radialGradient id="heatmap" cx="50%" cy="30%" r="50%">
+                <stop offset="0%"   stop-color="#c5f0c9" stop-opacity=".35"/>
+                <stop offset="60%"  stop-color="#c5f0c9" stop-opacity=".12"/>
+                <stop offset="100%" stop-color="#c5f0c9" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="hm3pt" cx="50%" cy="100%" r="60%">
+                <stop offset="0%"   stop-color="#c5f0c9" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="#c5f0c9" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <!-- court -->
+            <rect x="16" y="10" width="448" height="300" rx="3" fill="none" stroke="rgba(197,240,201,.2)" stroke-width="1.2"/>
+            <!-- paint -->
+            <rect x="170" y="10" width="140" height="88" fill="rgba(197,240,201,.03)" stroke="rgba(197,240,201,.18)" stroke-width="1"/>
+            <!-- free throw circle -->
+            <circle cx="240" cy="98" r="46" fill="none" stroke="rgba(197,240,201,.18)" stroke-width="1" stroke-dasharray="5,4"/>
+            <!-- restricted area -->
+            <path d="M 210 44 A 30 30 0 0 0 270 44" fill="none" stroke="rgba(197,240,201,.18)" stroke-width="1"/>
+            <!-- rim -->
+            <circle cx="240" cy="28" r="10" fill="none" stroke="rgba(197,240,201,.5)" stroke-width="1.5"/>
+            <line x1="215" y1="16" x2="265" y2="16" stroke="rgba(197,240,201,.4)" stroke-width="2.5"/>
+            <!-- 3pt arc -->
+            <path d="M 56 145 A 195 195 0 0 1 424 145" fill="none" stroke="rgba(197,240,201,.18)" stroke-width="1"/>
+            <line x1="56"  y1="10" x2="56"  y2="145" stroke="rgba(197,240,201,.18)" stroke-width="1"/>
+            <line x1="424" y1="10" x2="424" y2="145" stroke="rgba(197,240,201,.18)" stroke-width="1"/>
+            <!-- court boundary line -->
+            <line x1="16" y1="310" x2="464" y2="310" stroke="rgba(197,240,201,.15)" stroke-width="1"/>
+
+            <!-- HEATMAP OVERLAY -->
+            <ellipse cx="240" cy="50" rx="80" ry="60" fill="url(#heatmap)"/>
+            <ellipse cx="240" cy="220" rx="200" ry="80" fill="url(#hm3pt)"/>
+
+            <!-- MADE shots — paint (bright) -->
+            <circle cx="240" cy="50"  r="7.5" fill="#c5f0c9" opacity=".95"/>
+            <circle cx="222" cy="62"  r="6.5" fill="#c5f0c9" opacity=".85"/>
+            <circle cx="258" cy="60"  r="6.5" fill="#c5f0c9" opacity=".85"/>
+            <circle cx="240" cy="80"  r="6"   fill="#c5f0c9" opacity=".75"/>
+            <circle cx="210" cy="78"  r="5.5" fill="#c5f0c9" opacity=".70"/>
+            <circle cx="270" cy="75"  r="5.5" fill="#c5f0c9" opacity=".70"/>
+            <!-- mid-range made -->
+            <circle cx="96"  cy="92"  r="6" fill="#c5f0c9" opacity=".65"/>
+            <circle cx="384" cy="88"  r="6" fill="#c5f0c9" opacity=".65"/>
+            <circle cx="160" cy="108" r="6" fill="#c5f0c9" opacity=".60"/>
+            <circle cx="320" cy="108" r="6" fill="#c5f0c9" opacity=".60"/>
+            <!-- 3pt made -->
+            <circle cx="38"  cy="78"  r="6" fill="#c5f0c9" opacity=".55"/>
+            <circle cx="442" cy="78"  r="6" fill="#c5f0c9" opacity=".55"/>
+            <circle cx="110" cy="200" r="6" fill="#c5f0c9" opacity=".55"/>
+            <circle cx="370" cy="200" r="6" fill="#c5f0c9" opacity=".55"/>
+            <circle cx="240" cy="220" r="6" fill="#c5f0c9" opacity=".50"/>
+
+            <!-- MISSED shots — cross marker -->
+            <g stroke="rgba(197,240,201,.3)" stroke-width="1.8">
+              <line x1="132" y1="68" x2="142" y2="78"/><line x1="142" y1="68" x2="132" y2="78"/>
+              <line x1="338" y1="68" x2="348" y2="78"/><line x1="348" y1="68" x2="338" y2="78"/>
+              <line x1="70"  y1="122" x2="80" y2="132"/><line x1="80" y1="122" x2="70" y2="132"/>
+              <line x1="400" y1="122" x2="410" y2="132"/><line x1="410" y1="122" x2="400" y2="132"/>
+              <line x1="176" y1="160" x2="186" y2="170"/><line x1="186" y1="160" x2="176" y2="170"/>
+              <line x1="294" y1="160" x2="304" y2="170"/><line x1="304" y1="160" x2="294" y2="170"/>
+              <line x1="60"  y1="200" x2="70"  y2="210"/><line x1="70"  y1="200" x2="60"  y2="210"/>
+            </g>
+
+            <!-- MediaPipe pose stick (mini) - top right corner -->
+            <g opacity=".7" transform="translate(380,150)">
+              <!-- stick figure shooting -->
+              <circle cx="45" cy="12" r="8" fill="none" stroke="#c5f0c9" stroke-width="1.5"/>
+              <line x1="45" y1="20" x2="45" y2="55" stroke="#c5f0c9" stroke-width="1.5"/>
+              <line x1="45" y1="30" x2="25" y2="45" stroke="#c5f0c9" stroke-width="1.5"/>
+              <line x1="45" y1="30" x2="68" y2="20" stroke="#c5f0c9" stroke-width="1.5"/>
+              <line x1="45" y1="55" x2="34" y2="72" stroke="#c5f0c9" stroke-width="1.5"/>
+              <line x1="45" y1="55" x2="56" y2="72" stroke="#c5f0c9" stroke-width="1.5"/>
+              <!-- elbow angle arc -->
+              <path d="M 58 22 A 14 14 0 0 1 68 20" fill="none" stroke="#f39c12" stroke-width="1.2"/>
+              <text x="70" y="18" font-size="7" fill="#f39c12" font-family="monospace">142°</text>
+              <!-- label -->
+              <text x="45" y="86" font-size="7" fill="#c5f0c9" opacity=".5" text-anchor="middle" font-family="monospace">BEEF</text>
+            </g>
+
+            <!-- legend -->
+            <circle cx="24" cy="312" r="4" fill="#c5f0c9" opacity=".85"/>
+            <text x="32" y="315" font-size="8" fill="#c5f0c9" opacity=".45">Made</text>
+            <g stroke="rgba(197,240,201,.3)" stroke-width="1.5">
+              <line x1="76" y1="308" x2="82" y2="316"/><line x1="82" y1="308" x2="76" y2="316"/>
+            </g>
+            <text x="88" y="315" font-size="8" fill="#c5f0c9" opacity=".45">Missed</text>
+            <text x="240" y="315" font-size="8" fill="#c5f0c9" opacity=".35" text-anchor="middle" font-family="monospace">Shot Chart + MediaPipe BEEF Analysis</text>
+          </svg>
+        </div>
+        <div class="project-body sr-right">
+          <div class="project-meta sr">
+            <span class="project-num">03</span>
+            <span class="project-type">Computer Vision · Basketball</span>
+          </div>
+          <h2 class="project-title sr">Basketball<br/>Vision</h2>
+          <p class="project-desc sr">
+            NBA computer vision system combining shooting mechanics (BEEF principle — elbow angle, knee valgus via MediaPipe), offensive spacing score from Voronoi and convex hull, ball movement graph analysis with NetworkX, and R3D-18 action recognition across 7 NBA action classes. Shot charts with heatmap overlays.
+          </p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">7</span><span class="pm-lbl">Action classes</span></div>
+            <div class="pm"><span class="pm-val">142°</span><span class="pm-lbl">Elbow angle</span></div>
+            <div class="pm"><span class="pm-val">BEEF</span><span class="pm-lbl">Biomechanics</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">YOLOv8</span><span class="ptag">MediaPipe</span>
+            <span class="ptag">R3D-18</span><span class="ptag">NetworkX</span>
+            <span class="ptag">scipy</span><span class="ptag">nba_api</span>
+          </div>
+          <a href="https://github.com/Warmvne/Basketball_ComputerVision" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 04 Curriculum ── -->
+    <li class="project-item">
+      <div class="project-grid reverse">
+        <div class="project-thumb sr-right">
+          <!-- Terminal / Notebook mockup -->
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#0a0f0a;display:block">
+            <!-- window chrome -->
+            <rect width="480" height="320" rx="0" fill="#0f1a0f"/>
+            <rect width="480" height="32" fill="#1a2a1a"/>
+            <circle cx="18" cy="16" r="5.5" fill="#ff5f56"/>
+            <circle cx="34" cy="16" r="5.5" fill="#ffbd2e"/>
+            <circle cx="50" cy="16" r="5.5" fill="#27c93f"/>
+            <text x="240" y="21" font-size="10" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">sport_scientist_curriculum.ipynb</text>
+            <!-- sidebar file tree -->
+            <rect x="0" y="32" width="110" height="288" fill="rgba(197,240,201,.03)" stroke="rgba(197,240,201,.08)" stroke-width="0"/>
+            <line x1="110" y1="32" x2="110" y2="320" stroke="rgba(197,240,201,.1)" stroke-width="1"/>
+            <text x="12" y="56"  font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 01_statistics</text>
+            <text x="12" y="72"  font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 02_machine_learning</text>
+            <text x="12" y="88"  font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 03_python</text>
+            <text x="12" y="104" font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 04_r_language</text>
+            <text x="12" y="120" font-size="8" fill="rgba(197,240,201,.55)" font-family="monospace">▸ 05_football</text>
+            <text x="20" y="136" font-size="7.5" fill="rgba(197,240,201,.7)"  font-family="monospace">  xg_model.ipynb</text>
+            <text x="20" y="150" font-size="7.5" fill="rgba(197,240,201,.45)" font-family="monospace">  statsbomb_eda.ipynb</text>
+            <text x="20" y="164" font-size="7.5" fill="rgba(197,240,201,.45)" font-family="monospace">  pass_network.ipynb</text>
+            <text x="12" y="180" font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 06_basketball</text>
+            <!-- active indicator -->
+            <rect x="0" y="128" width="4" height="14" fill="#c5f0c9"/>
+
+            <!-- notebook cells -->
+            <!-- cell 1: markdown -->
+            <rect x="122" y="44" width="346" height="38" rx="3" fill="rgba(197,240,201,.04)" stroke="rgba(197,240,201,.12)"/>
+            <text x="134" y="60" font-size="9" fill="#c5f0c9" opacity=".6" font-family="monospace">## Expected Goals (xG) Model</text>
+            <text x="134" y="76" font-size="8" fill="rgba(197,240,201,.4)" font-family="monospace">StatsBomb open data · Logistic Regression baseline</text>
+
+            <!-- cell 2: code -->
+            <rect x="122" y="92" width="346" height="90" rx="3" fill="rgba(197,240,201,.03)" stroke="rgba(197,240,201,.1)"/>
+            <rect x="122" y="92" width="16" height="90" rx="3 0 0 3" fill="rgba(197,240,201,.06)"/>
+            <text x="145" y="110" font-size="8" font-family="monospace">
+              <tspan fill="#7ec8e3">import</tspan><tspan fill="rgba(197,240,201,.7)"> pandas </tspan><tspan fill="#7ec8e3">as</tspan><tspan fill="rgba(197,240,201,.7)"> pd</tspan>
+            </text>
+            <text x="145" y="124" font-size="8" font-family="monospace">
+              <tspan fill="#7ec8e3">from</tspan><tspan fill="rgba(197,240,201,.7)"> statsbombpy </tspan><tspan fill="#7ec8e3">import</tspan><tspan fill="rgba(197,240,201,.7)"> sb</tspan>
+            </text>
+            <text x="145" y="138" font-size="8" font-family="monospace" fill="rgba(197,240,201,.7)"/>
+            <text x="145" y="152" font-size="8" font-family="monospace">
+              <tspan fill="#f9a03f">events</tspan><tspan fill="rgba(197,240,201,.6)"> = sb.events(match_id=</tspan><tspan fill="#c5f0c9">3773369</tspan><tspan fill="rgba(197,240,201,.6)">)</tspan>
+            </text>
+            <text x="145" y="166" font-size="8" font-family="monospace">
+              <tspan fill="#f9a03f">shots</tspan><tspan fill="rgba(197,240,201,.6)"> = events[events.type == </tspan><tspan fill="#98d982">'Shot'</tspan><tspan fill="rgba(197,240,201,.6)">]</tspan>
+            </text>
+            <text x="130" y="128" font-size="7.5" fill="rgba(197,240,201,.25)" font-family="monospace">[1]</text>
+
+            <!-- cell 3: output / chart -->
+            <rect x="122" y="192" width="346" height="90" rx="3" fill="rgba(197,240,201,.02)" stroke="rgba(197,240,201,.08)"/>
+            <text x="134" y="210" font-size="8" fill="rgba(197,240,201,.3)" font-family="monospace">Out [1]:</text>
+            <!-- mini bar chart -->
+            <rect x="148" y="216" width="18" height="52" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="174" y="228" width="18" height="40" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="200" y="236" width="18" height="32" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="226" y="222" width="18" height="46" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="252" y="232" width="18" height="36" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="278" y="218" width="18" height="50" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="304" y="242" width="18" height="26" rx="2" fill="rgba(197,240,201,.5)"/>
+            <rect x="330" y="238" width="18" height="30" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="356" y="248" width="18" height="20" rx="2" fill="rgba(197,240,201,.15)"/>
+            <rect x="382" y="226" width="18" height="42" rx="2" fill="rgba(197,240,201,.15)"/>
+            <line x1="138" y1="268" x2="412" y2="268" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+
+            <!-- stats badges -->
+            <rect x="130" y="292" width="58" height="20" rx="3" fill="rgba(197,240,201,.1)" stroke="rgba(197,240,201,.2)"/>
+            <text x="159" y="305" font-size="8" fill="#c5f0c9" text-anchor="middle" font-family="monospace">37 notebooks</text>
+            <rect x="196" y="292" width="52" height="20" rx="3" fill="rgba(197,240,201,.1)" stroke="rgba(197,240,201,.2)"/>
+            <text x="222" y="305" font-size="8" fill="#c5f0c9" text-anchor="middle" font-family="monospace">6 months</text>
+            <rect x="256" y="292" width="50" height="20" rx="3" fill="rgba(197,240,201,.1)" stroke="rgba(197,240,201,.2)"/>
+            <text x="281" y="305" font-size="8" fill="#c5f0c9" text-anchor="middle" font-family="monospace">Python + R</text>
+            <rect x="314" y="292" width="70" height="20" rx="3" fill="rgba(197,240,201,.1)" stroke="rgba(197,240,201,.2)"/>
+            <text x="349" y="305" font-size="8" fill="#c5f0c9" text-anchor="middle" font-family="monospace">Open Source</text>
+          </svg>
+        </div>
+        <div class="project-body sr-left">
+          <div class="project-meta sr">
+            <span class="project-num">04</span>
+            <span class="project-type">Education · Open Source</span>
+          </div>
+          <h2 class="project-title sr">Sport Sci<br/>Curriculum</h2>
+          <p class="project-desc sr">
+            Open-source 6-month self-directed learning programme covering statistics, ML theory, Python, R, football analytics (StatsBomb, xG modeling), and basketball analytics (NBA advanced metrics, tracking data). 37 structured notebooks with exercises and solutions — designed for aspiring sport scientists with no prior coding background.
+          </p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">37</span><span class="pm-lbl">Notebooks</span></div>
+            <div class="pm"><span class="pm-val">6</span><span class="pm-lbl">Months</span></div>
+            <div class="pm"><span class="pm-val">2</span><span class="pm-lbl">Languages</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">Python</span><span class="ptag">R</span>
+            <span class="ptag">StatsBomb</span><span class="ptag">Jupyter</span>
+            <span class="ptag">ggplot2</span><span class="ptag">tidyverse</span>
+          </div>
+          <a href="https://github.com/Warmvne/SportScientist-Curriculum" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 05 BrainBridge ── -->
+    <li class="project-item">
+      <div class="project-grid">
+        <div class="project-thumb sr-left">
+          <!-- Chrome extension popup mockup -->
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#0c120c;display:block">
+            <!-- browser chrome -->
+            <rect x="60" y="16" width="360" height="288" rx="8" fill="#161e16" stroke="rgba(197,240,201,.15)" stroke-width="1"/>
+            <!-- browser top bar -->
+            <rect x="60" y="16" width="360" height="36" rx="8 8 0 0" fill="#1c261c"/>
+            <circle cx="82" cy="34" r="5" fill="rgba(255,255,255,.12)"/>
+            <circle cx="98" cy="34" r="5" fill="rgba(255,255,255,.12)"/>
+            <circle cx="114" cy="34" r="5" fill="rgba(255,255,255,.12)"/>
+            <!-- url bar -->
+            <rect x="130" y="25" width="220" height="18" rx="9" fill="rgba(197,240,201,.06)"/>
+            <text x="240" y="37" font-size="8" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">claude.ai/chat</text>
+            <!-- extension icon in toolbar -->
+            <circle cx="368" cy="34" r="8" fill="rgba(197,240,201,.15)" stroke="rgba(197,240,201,.3)" stroke-width="1"/>
+            <text x="368" y="38" font-size="8" fill="#c5f0c9" text-anchor="middle" font-weight="bold">B</text>
+
+            <!-- main page content (dimmed, loading) -->
+            <rect x="70" y="62" width="340" height="14" rx="3" fill="rgba(197,240,201,.06)"/>
+            <rect x="70" y="82" width="280" height="10" rx="3" fill="rgba(197,240,201,.04)"/>
+            <rect x="70" y="98" width="310" height="10" rx="3" fill="rgba(197,240,201,.04)"/>
+            <rect x="70" y="114" width="260" height="10" rx="3" fill="rgba(197,240,201,.04)"/>
+            <!-- loading spinner on page -->
+            <circle cx="240" cy="180" r="18" fill="none" stroke="rgba(197,240,201,.1)" stroke-width="2.5"/>
+            <path d="M 240 162 A 18 18 0 0 1 258 180" fill="none" stroke="rgba(197,240,201,.5)" stroke-width="2.5" stroke-linecap="round"/>
+            <text x="240" y="218" font-size="9" fill="rgba(197,240,201,.25)" text-anchor="middle" font-family="monospace">Waiting for AI response...</text>
+
+            <!-- EXTENSION POPUP OVERLAY -->
+            <rect x="268" y="46" width="142" height="196" rx="8" fill="#1a2e1a" stroke="rgba(197,240,201,.4)" stroke-width="1.2"/>
+            <!-- arrow pointer -->
+            <polygon points="362,42 370,46 378,42" fill="#1a2e1a" stroke="rgba(197,240,201,.4)" stroke-width="1"/>
+            <!-- popup header -->
+            <rect x="268" y="46" width="142" height="32" rx="8 8 0 0" fill="#213221"/>
+            <text x="280" y="66" font-size="9" fill="#c5f0c9" font-weight="600" font-family="monospace">🧠 BrainBridge</text>
+
+            <!-- mini game area -->
+            <rect x="278" y="84" width="122" height="90" rx="4" fill="rgba(197,240,201,.04)" stroke="rgba(197,240,201,.15)"/>
+            <text x="339" y="102" font-size="8" fill="rgba(197,240,201,.4)" text-anchor="middle" font-family="monospace">QUICK MATH</text>
+            <text x="339" y="126" font-size="20" fill="#c5f0c9" text-anchor="middle" font-family="monospace" font-weight="bold">8 × 7 = ?</text>
+            <!-- answer buttons -->
+            <rect x="286" y="144" width="30" height="22" rx="3" fill="rgba(197,240,201,.08)" stroke="rgba(197,240,201,.2)"/>
+            <text x="301" y="159" font-size="9" fill="#c5f0c9" text-anchor="middle" font-family="monospace">48</text>
+            <rect x="322" y="144" width="30" height="22" rx="3" fill="rgba(197,240,201,.25)" stroke="rgba(197,240,201,.5)"/>
+            <text x="337" y="159" font-size="9" fill="#c5f0c9" text-anchor="middle" font-family="monospace">56</text>
+            <rect x="358" y="144" width="30" height="22" rx="3" fill="rgba(197,240,201,.08)" stroke="rgba(197,240,201,.2)"/>
+            <text x="373" y="159" font-size="9" fill="#c5f0c9" text-anchor="middle" font-family="monospace">64</text>
+
+            <!-- stats -->
+            <line x1="278" y1="184" x2="400" y2="184" stroke="rgba(197,240,201,.1)" stroke-width=".8"/>
+            <text x="289" y="198" font-size="7.5" fill="rgba(197,240,201,.4)" font-family="monospace">Score: 12</text>
+            <text x="360" y="198" font-size="7.5" fill="rgba(197,240,201,.4)" font-family="monospace">⏱ 23s</text>
+            <!-- streak -->
+            <text x="339" y="228" font-size="8" fill="#c5f0c9" text-anchor="middle" font-family="monospace" opacity=".6">🔥 3 streak</text>
+
+            <!-- api intercept indicator -->
+            <rect x="68" y="278" width="344" height="22" rx="3" fill="rgba(197,240,201,.04)" stroke="rgba(197,240,201,.1)"/>
+            <circle cx="82" cy="289" r="4" fill="#22c55e"/>
+            <text x="92" y="293" font-size="8" fill="rgba(197,240,201,.4)" font-family="monospace">API request intercepted · Cognitive game launched</text>
+          </svg>
+        </div>
+        <div class="project-body sr-right">
+          <div class="project-meta sr">
+            <span class="project-num">05</span>
+            <span class="project-type">Chrome Extension · JS</span>
+          </div>
+          <h2 class="project-title sr">Brain<br/>Bridge</h2>
+          <p class="project-desc sr">
+            Chrome extension that intercepts outgoing API requests to AI services (Claude, ChatGPT, Gemini) and automatically launches short cognitive mini-games during the wait period. Eliminates passive idle time, keeps the user mentally engaged, and improves the subjective experience of working with AI tools.
+          </p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">0ms</span><span class="pm-lbl">Idle time</span></div>
+            <div class="pm"><span class="pm-val">API</span><span class="pm-lbl">Intercept</span></div>
+            <div class="pm"><span class="pm-val">3+</span><span class="pm-lbl">Game modes</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">JavaScript</span><span class="ptag">Chrome API</span>
+            <span class="ptag">WebExtensions</span><span class="ptag">Service Worker</span>
+          </div>
+          <a href="https://github.com/Warmvne/BrainBridge" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 06 Acoustic ── -->
+    <li class="project-item">
+      <div class="project-grid reverse">
+        <div class="project-thumb sr-right">
+          <!-- Spectrogram / heatmap style -->
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#080d08;display:block">
+            <defs>
+              <!-- spectrogram color scale -->
+              <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="rgba(197,240,201,0)"/>
+                <stop offset="30%"  stop-color="rgba(197,240,201,.15)"/>
+                <stop offset="60%"  stop-color="rgba(197,240,201,.5)"/>
+                <stop offset="85%"  stop-color="rgba(197,240,201,.8)"/>
+                <stop offset="100%" stop-color="#c5f0c9"/>
+              </linearGradient>
+            </defs>
+
+            <!-- title -->
+            <text x="20" y="24" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">ROOM IMPULSE RESPONSE ANALYSIS</text>
+
+            <!-- frequency axis label -->
+            <text x="14" y="160" font-size="8" fill="rgba(197,240,201,.3)" text-anchor="middle" transform="rotate(-90,14,160)" font-family="monospace">Frequency (Hz)</text>
+            <text x="260" y="316" font-size="8" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">Time (ms)</text>
+
+            <!-- y-axis ticks -->
+            <g font-size="7" fill="rgba(197,240,201,.3)" text-anchor="end" font-family="monospace">
+              <text x="36" y="46">8k</text>
+              <text x="36" y="90">4k</text>
+              <text x="36" y="134">2k</text>
+              <text x="36" y="178">1k</text>
+              <text x="36" y="222">500</text>
+              <text x="36" y="266">250</text>
+              <text x="36" y="302">100</text>
+            </g>
+            <!-- grid lines -->
+            <g stroke="rgba(197,240,201,.07)" stroke-width=".6">
+              <line x1="40" y1="40"  x2="460" y2="40"/>
+              <line x1="40" y1="84"  x2="460" y2="84"/>
+              <line x1="40" y1="128" x2="460" y2="128"/>
+              <line x1="40" y1="172" x2="460" y2="172"/>
+              <line x1="40" y1="216" x2="460" y2="216"/>
+              <line x1="40" y1="260" x2="460" y2="260"/>
+              <line x1="40" y1="300" x2="460" y2="300"/>
+              <line x1="40"  y1="40" x2="40"  y2="300"/>
+              <line x1="152" y1="40" x2="152" y2="300"/>
+              <line x1="264" y1="40" x2="264" y2="300"/>
+              <line x1="376" y1="40" x2="376" y2="300"/>
+              <line x1="460" y1="40" x2="460" y2="300"/>
+            </g>
+
+            <!-- spectrogram cells (simulated heatmap) -->
+            <!-- high energy bands at low freq, initial reflection -->
+            <rect x="40"  y="260" width="30" height="40" fill="rgba(197,240,201,.55)"/>
+            <rect x="70"  y="260" width="25" height="40" fill="rgba(197,240,201,.70)"/>
+            <rect x="95"  y="260" width="20" height="40" fill="rgba(197,240,201,.85)"/>
+            <rect x="115" y="260" width="18" height="40" fill="rgba(197,240,201,.65)"/>
+            <rect x="133" y="260" width="30" height="40" fill="rgba(197,240,201,.30)"/>
+
+            <rect x="40"  y="216" width="30" height="44" fill="rgba(197,240,201,.35)"/>
+            <rect x="70"  y="216" width="25" height="44" fill="rgba(197,240,201,.55)"/>
+            <rect x="95"  y="216" width="20" height="44" fill="rgba(197,240,201,.75)"/>
+            <rect x="115" y="216" width="18" height="44" fill="rgba(197,240,201,.60)"/>
+            <rect x="133" y="216" width="30" height="44" fill="rgba(197,240,201,.25)"/>
+
+            <rect x="40"  y="172" width="30" height="44" fill="rgba(197,240,201,.20)"/>
+            <rect x="70"  y="172" width="25" height="44" fill="rgba(197,240,201,.35)"/>
+            <rect x="95"  y="172" width="20" height="44" fill="rgba(197,240,201,.55)"/>
+            <rect x="115" y="172" width="18" height="44" fill="rgba(197,240,201,.45)"/>
+
+            <rect x="40"  y="128" width="30" height="44" fill="rgba(197,240,201,.10)"/>
+            <rect x="70"  y="128" width="25" height="44" fill="rgba(197,240,201,.18)"/>
+            <rect x="95"  y="128" width="20" height="44" fill="rgba(197,240,201,.30)"/>
+            <rect x="115" y="128" width="18" height="44" fill="rgba(197,240,201,.22)"/>
+
+            <!-- secondary reflection at ~150ms -->
+            <rect x="152" y="260" width="22" height="40" fill="rgba(197,240,201,.40)"/>
+            <rect x="174" y="260" width="18" height="40" fill="rgba(197,240,201,.55)"/>
+            <rect x="192" y="260" width="15" height="40" fill="rgba(197,240,201,.45)"/>
+            <rect x="207" y="260" width="22" height="40" fill="rgba(197,240,201,.25)"/>
+
+            <rect x="152" y="216" width="22" height="44" fill="rgba(197,240,201,.28)"/>
+            <rect x="174" y="216" width="18" height="44" fill="rgba(197,240,201,.42)"/>
+            <rect x="192" y="216" width="15" height="44" fill="rgba(197,240,201,.35)"/>
+
+            <rect x="152" y="172" width="22" height="44" fill="rgba(197,240,201,.15)"/>
+            <rect x="174" y="172" width="18" height="44" fill="rgba(197,240,201,.22)"/>
+
+            <!-- long reverb tail -->
+            <rect x="264" y="260" width="196" height="40" fill="url(#sg)"/>
+            <rect x="264" y="216" width="150" height="44" fill="rgba(197,240,201,.08)"/>
+
+            <!-- waveform overlay -->
+            <polyline
+              points="40,170 55,155 65,140 78,128 90,120 100,110 112,108 120,100 130,105 140,118 152,110 165,100 175,94 185,98 200,106 215,112 230,116 250,118 270,120 300,121 340,122 390,122 460,122"
+              fill="none" stroke="#c5f0c9" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
+
+            <!-- microphone positions -->
+            <g transform="translate(0,0)">
+              <line x1="100" y1="300" x2="100" y2="308" stroke="rgba(197,240,201,.3)" stroke-width="1"/>
+              <rect x="94" y="296" width="12" height="8" rx="2" fill="none" stroke="rgba(197,240,201,.4)" stroke-width="1"/>
+              <text x="100" y="315" font-size="7" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">M1</text>
+              <line x1="264" y1="300" x2="264" y2="308" stroke="rgba(197,240,201,.3)" stroke-width="1"/>
+              <rect x="258" y="296" width="12" height="8" rx="2" fill="none" stroke="rgba(197,240,201,.4)" stroke-width="1"/>
+              <text x="264" y="315" font-size="7" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">M2</text>
+              <line x1="420" y1="300" x2="420" y2="308" stroke="rgba(197,240,201,.3)" stroke-width="1"/>
+              <rect x="414" y="296" width="12" height="8" rx="2" fill="none" stroke="rgba(197,240,201,.4)" stroke-width="1"/>
+              <text x="420" y="315" font-size="7" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">M3</text>
+            </g>
+
+            <!-- color scale legend -->
+            <rect x="320" y="40" width="120" height="10" rx="2">
+              <animate attributeName="opacity" values="0;1" dur=".5s" fill="freeze"/>
+            </rect>
+            <defs>
+              <linearGradient id="legend_sg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="rgba(197,240,201,0)"/>
+                <stop offset="100%" stop-color="#c5f0c9"/>
+              </linearGradient>
+            </defs>
+            <rect x="320" y="40" width="120" height="10" rx="2" fill="url(#legend_sg)" stroke="rgba(197,240,201,.2)"/>
+            <text x="320" y="62" font-size="7" fill="rgba(197,240,201,.4)" font-family="monospace">Low</text>
+            <text x="440" y="62" font-size="7" fill="rgba(197,240,201,.4)" text-anchor="end" font-family="monospace">High energy</text>
+          </svg>
+        </div>
+        <div class="project-body sr-left">
+          <div class="project-meta sr">
+            <span class="project-num">06</span>
+            <span class="project-type">Hackathon · Signal Processing</span>
+          </div>
+          <h2 class="project-title sr">Acoustic<br/>Localization</h2>
+          <p class="project-desc sr">
+            Hackathon project tackling indoor person localization from Room Impulse Responses (RIRs) captured by microphone arrays. Combines signal processing techniques (spectrogram extraction, TDOA estimation) with deep learning models trained to regress 3D spatial coordinates from acoustic fingerprints — no camera or GPS required.
+          </p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">3D</span><span class="pm-lbl">Coordinates</span></div>
+            <div class="pm"><span class="pm-val">RIR</span><span class="pm-lbl">Based</span></div>
+            <div class="pm"><span class="pm-val">DL</span><span class="pm-lbl">Model</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">Python</span><span class="ptag">Signal Processing</span>
+            <span class="ptag">Deep Learning</span><span class="ptag">TDOA</span>
+            <span class="ptag">NumPy</span><span class="ptag">PyTorch</span>
+          </div>
+          <a href="https://github.com/Warmvne/ia_data_hack_acoustic" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════
+     SKILLS
+══════════════════════════════════ -->
+<section id="skills">
+  <div class="sec-header sr">
+    <p class="sec-eyebrow">Stack &amp; Tools</p>
+    <h2 class="sec-title">Technical<br/>Expertise</h2>
+  </div>
+  <div class="skills-grid">
+
+    <div class="skill-card sr" style="transition-delay:.05s">
+      <div class="sk-header">
+        <span class="sk-icon">⚡</span>
+        <span class="sk-title">Machine Learning</span>
+      </div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">XGBoost</span>
+        <span class="sk-pill highlight">Gradient Boosting</span>
+        <span class="sk-pill">Random Forest</span>
+        <span class="sk-pill highlight">SHAP</span>
+        <span class="sk-pill">Temporal CV</span>
+        <span class="sk-pill">Cox PH</span>
+        <span class="sk-pill">K-Means</span>
+        <span class="sk-pill">DBSCAN</span>
+        <span class="sk-pill">PCA</span>
+        <span class="sk-pill">UMAP</span>
+      </div>
+    </div>
+
+    <div class="skill-card sr" style="transition-delay:.12s">
+      <div class="sk-header">
+        <span class="sk-icon">👁</span>
+        <span class="sk-title">Computer Vision</span>
+      </div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">YOLOv8</span>
+        <span class="sk-pill highlight">ByteTrack</span>
+        <span class="sk-pill highlight">MediaPipe</span>
+        <span class="sk-pill">Homography</span>
+        <span class="sk-pill">R3D-18</span>
+        <span class="sk-pill">Optical Flow</span>
+        <span class="sk-pill">OpenCV</span>
+        <span class="sk-pill">Pose Estimation</span>
+      </div>
+    </div>
+
+    <div class="skill-card sr" style="transition-delay:.19s">
+      <div class="sk-header">
+        <span class="sk-icon">🏃</span>
+        <span class="sk-title">Sports Analytics</span>
+      </div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">Load Management</span>
+        <span class="sk-pill highlight">ACWR</span>
+        <span class="sk-pill">StatsBomb</span>
+        <span class="sk-pill">xG Modeling</span>
+        <span class="sk-pill">NBA Metrics</span>
+        <span class="sk-pill">GPS / Wearables</span>
+        <span class="sk-pill">Voronoi</span>
+        <span class="sk-pill">RAPTOR / BPM</span>
+      </div>
+    </div>
+
+    <div class="skill-card sr" style="transition-delay:.26s">
+      <div class="sk-header">
+        <span class="sk-icon">🗄</span>
+        <span class="sk-title">Data Engineering</span>
+      </div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">dbt</span>
+        <span class="sk-pill highlight">Snowflake</span>
+        <span class="sk-pill">AWS S3</span>
+        <span class="sk-pill">Azure Databricks</span>
+        <span class="sk-pill">Delta Lake</span>
+        <span class="sk-pill">Data Vault</span>
+        <span class="sk-pill">Docker</span>
+        <span class="sk-pill">CI/CD</span>
+      </div>
+    </div>
+
+    <div class="skill-card sr" style="transition-delay:.33s">
+      <div class="sk-header">
+        <span class="sk-icon">💻</span>
+        <span class="sk-title">Languages</span>
+      </div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">Python</span>
+        <span class="sk-pill highlight">SQL</span>
+        <span class="sk-pill">R</span>
+        <span class="sk-pill">JavaScript</span>
+        <span class="sk-pill">pandas</span>
+        <span class="sk-pill">PyTorch</span>
+        <span class="sk-pill">scikit-learn</span>
+        <span class="sk-pill">tidyverse</span>
+        <span class="sk-pill">lme4</span>
+      </div>
+    </div>
+
+    <div class="skill-card sr" style="transition-delay:.40s">
+      <div class="sk-header">
+        <span class="sk-icon">📊</span>
+        <span class="sk-title">BI &amp; Visualization</span>
+      </div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">Power BI</span>
+        <span class="sk-pill">DAX</span>
+        <span class="sk-pill">MicroStrategy</span>
+        <span class="sk-pill">Plotly</span>
+        <span class="sk-pill">mplsoccer</span>
+        <span class="sk-pill">ggplot2</span>
+        <span class="sk-pill">KPI Governance</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     CONTACT
+══════════════════════════════════ -->
+<section id="contact">
+  <h2 class="contact-heading sr">
+    Let's<br/><span>Work</span><br/>Together
+  </h2>
+
+  <a href="mailto:marwane.boubekeur@gmail.com" class="contact-btn sr">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <rect x="2" y="4" width="20" height="16" rx="2"/>
+      <polyline points="2,4 12,13 22,4"/>
+    </svg>
+    Contact Me
+  </a>
+
+  <div class="contact-links sr">
+    <a href="mailto:marwane.boubekeur@gmail.com" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/>
+      </svg>
+      marwane.boubekeur@gmail.com
+    </a>
+    <a href="https://github.com/Warmvne" target="_blank" rel="noopener" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+      </svg>
+      github.com/Warmvne
+    </a>
+    <a href="https://linkedin.com" target="_blank" rel="noopener" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+        <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+      </svg>
+      LinkedIn
+    </a>
+    <a href="Marwane_Boubekeur_CV.pdf" download class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Download CV
+    </a>
+  </div>
+
+  <p class="footer-copy sr">© 2026 Marwane Boubekeur — Paris, France</p>
+</section>
+
+</main>
+
+<script>
+/* ── Canvas particles ── */
+const cvs = document.getElementById('bg'), ctx = cvs.getContext('2d');
+let W, H, pts;
+const resize = () => { W = cvs.width = window.innerWidth; H = cvs.height = window.innerHeight; };
+const mkPts  = () => pts = Array.from({length:50}, () => ({
+  x:Math.random()*W, y:Math.random()*H,
+  r:Math.random()*.9+.2,
+  vx:(Math.random()-.5)*.14, vy:(Math.random()-.5)*.14,
+  o:Math.random()*.18+.03
+}));
+const tick = () => {
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(197,240,201,${p.o})`; ctx.fill();
+  });
+  requestAnimationFrame(tick);
+};
+resize(); mkPts(); tick();
+window.addEventListener('resize',()=>{ resize(); mkPts(); });
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const delay = parseFloat(el.style.transitionDelay || el.dataset.delay || 0);
+    // transitionDelay already set via style attr on skill cards; for others use data-delay
+    el.classList.add('on');
+    io.unobserve(el);
+  });
+}, { threshold: 0.10, rootMargin: '0px 0px -40px 0px' });
+
+// generic sr elements
+document.querySelectorAll('.sr, .sr-left, .sr-right').forEach((el, i) => {
+  // don't override skill-card inline delay
+  if (!el.style.transitionDelay) {
+    el.dataset.delay = 0;
+  }
+  io.observe(el);
+});
+
+/* ── Project item: border reveal ── */
+const borderIo = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('border-on');
+      borderIo.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.project-item').forEach(el => borderIo.observe(el));
+
+/* ── Emoji particles: scattered + magnetic + glow + swap on click ── */
+(function() {
+  const ALL_EMOJIS = [
+    '⚽','🏀','🏈','🎾','🏋️','🤸','🏊','🚴','⛷️','🎿',
+    '📊','📈','🤖','🧠','💻','🔬','📡','🧬','⚡','🎯',
+    '🏆','🥇','💪','🎽','👟','🏅','📉','🗂️','🔭','🧮'
+  ];
+  const container = document.getElementById('emoji-bg');
+  const hero      = document.getElementById('hero');
+  const particles = [];
+  const COUNT     = 24;
+
+  // dead zone in the centre where the name lives (% of hero)
+  const CX = 50, CY = 45, DEAD_RX = 28, DEAD_RY = 22;
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function randEmoji() { return ALL_EMOJIS[Math.floor(Math.random() * ALL_EMOJIS.length)]; }
+
+  // place outside centre dead zone
+  function scatteredPos() {
+    let x, y, tries = 0;
+    do {
+      x = rand(3, 97); y = rand(4, 94);
+      const dx = (x - CX) / DEAD_RX, dy = (y - CY) / DEAD_RY;
+      if (dx * dx + dy * dy > 1) break;
+    } while (++tries < 40);
+    return { x, y };
+  }
+
+  // mouse position in % of hero
+  let mx = 50, my = 50;
+  hero.addEventListener('mousemove', e => {
+    const r = hero.getBoundingClientRect();
+    mx = (e.clientX - r.left) / r.width  * 100;
+    my = (e.clientY - r.top)  / r.height * 100;
+  });
+  hero.addEventListener('mouseleave', () => { mx = 50; my = 50; });
+
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement('span');
+    el.className = 'ep';
+    const size = rand(38, 66);
+    el.style.fontSize = size + 'px';
+    el.textContent = randEmoji();
+    // glow via text-shadow
+    el.style.textShadow = '0 0 18px rgba(197,240,201,0)';
+
+    const pos = scatteredPos();
+    const p = {
+      el,
+      x: pos.x, y: pos.y,
+      vx: rand(-0.04, 0.04) || 0.02,
+      vy: rand(-0.04, 0.04) || 0.02,
+      baseOpacity: rand(0.38, 0.72),
+      // glow pulse
+      glowPhase: Math.random() * Math.PI * 2,
+      glowFreq:  rand(0.0008, 0.0018),
+      // bob
+      bobAmp:    rand(0.6, 1.6),
+      bobFreq:   rand(0.0007, 0.0014),
+      bobOffset: Math.random() * Math.PI * 2,
+      // repulsion state
+      repelling: false,
+    };
+    el.style.opacity = p.baseOpacity;
+    container.appendChild(el);
+    particles.push(p);
+
+    // SWAP on click + burst effect
+    el.addEventListener('click', () => {
+      // swap to a different emoji
+      let next;
+      do { next = randEmoji(); } while (next === el.textContent);
+      el.textContent = next;
+      el.style.textShadow = '0 0 32px rgba(197,240,201,.9)';
+      setTimeout(() => { el.style.textShadow = '0 0 18px rgba(197,240,201,0)'; }, 400);
+      // scatter burst — fast in random direction, decelerate
+      p.vx = rand(-0.18, 0.18) || 0.1;
+      p.vy = rand(-0.18, 0.18) || 0.1;
+      // pop animation
+      el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+      el.addEventListener('animationend', () => el.classList.remove('pop'), {once:true});
+      // decelerate back
+      setTimeout(() => { p.vx *= 0.15; p.vy *= 0.15; }, 1000);
+    });
+  }
+
+  function animEmoji(t) {
+    const W = hero.offsetWidth, H = hero.offsetHeight;
+
+    particles.forEach(p => {
+      // ── MAGNETIC repulsion from cursor ──
+      const dx = p.x - mx, dy = p.y - my;
+      // scale dy to account for hero aspect ratio (pixels vs %)
+      const dist = Math.sqrt(dx * dx + dy * (dy * W / H * W / H));
+      const RADIUS = 16; // repulsion radius in %
+      if (dist < RADIUS && dist > 0.1) {
+        const force = (1 - dist / RADIUS) * 0.055;
+        p.vx += (dx / dist) * force;
+        p.vy += (dy / dist) * force;
+        p.repelling = true;
+      } else {
+        p.repelling = false;
+      }
+
+      // ── BOB ──
+      p.y += Math.sin(t * p.bobFreq + p.bobOffset) * p.bobAmp * 0.0014;
+
+      // ── DRIFT ──
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // ── FRICTION ── (damp toward natural speed)
+      const maxV = 0.06;
+      const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (speed > maxV) {
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+      }
+
+      // ── BOUNCE off walls ──
+      if (p.x < 2)  { p.x = 2;  p.vx =  Math.abs(p.vx); }
+      if (p.x > 97) { p.x = 97; p.vx = -Math.abs(p.vx); }
+      if (p.y < 3)  { p.y = 3;  p.vy =  Math.abs(p.vy); }
+      if (p.y > 94) { p.y = 94; p.vy = -Math.abs(p.vy); }
+
+      // ── GLOW pulse ──
+      const glow = (Math.sin(t * p.glowFreq + p.glowPhase) + 1) / 2; // 0..1
+      const glowAlpha = (p.repelling ? 0.7 : glow * 0.35).toFixed(2);
+      p.el.style.textShadow = `0 0 20px rgba(197,240,201,${glowAlpha})`;
+      p.el.style.opacity = (p.baseOpacity + glow * 0.18).toFixed(2);
+
+      p.el.style.left = p.x + '%';
+      p.el.style.top  = p.y + '%';
+    });
+
+    requestAnimationFrame(animEmoji);
+  }
+  requestAnimationFrame(animEmoji);
+})();
+</script>
+</body>
+</html>

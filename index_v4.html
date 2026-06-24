@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marwane Boubekeur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --bg:    #101010;
+      --bg2:   #161616;
+      --bg3:   #1c1c1c;
+      --mint:  #c5f0c9;
+      --mintd: rgba(197,240,201,.10);
+      --dim:   rgba(197,240,201,.45);
+      --border:rgba(197,240,201,.14);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      background: var(--bg); color: var(--mint);
+      font-family: 'Inter', sans-serif; font-size: 16px;
+      -webkit-font-smoothing: antialiased; scroll-behavior: smooth;
+    }
+    body { background: var(--bg); overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; cursor: pointer; }
+    ::selection { background: #ff3d00; color: var(--mint); }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 999;
+      background: var(--mint); transform-origin: left;
+      animation: load 1.6s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes load { 0%{transform:scaleX(0);opacity:1} 85%{transform:scaleX(1);opacity:1} 100%{transform:scaleX(1);opacity:0} }
+
+    /* ── CANVAS ── */
+    canvas#bg { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+
+    /* ── MAIN ── */
+    main { position:relative; z-index:2; pointer-events:none; }
+    main a, main button, main section { pointer-events:auto; }
+
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    #hero {
+      position:relative; height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:10rem;
+    }
+    .hero-name {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(72px,13vw,17rem);
+      line-height:.85; letter-spacing:-.01em;
+      text-transform:uppercase; color:var(--mint);
+      white-space:nowrap; text-align:center; user-select:none;
+      animation: heroIn 1.2s cubic-bezier(.215,.61,.355,1) .3s both;
+    }
+    @keyframes heroIn { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:none} }
+
+    .hero-footer {
+      position:absolute; bottom:4rem; left:6rem;
+      width:calc(100% - 12rem);
+      display:flex; justify-content:space-between; align-items:flex-end;
+      pointer-events:auto;
+      animation: heroIn 1s cubic-bezier(.215,.61,.355,1) .7s both;
+    }
+    .hero-footer-left { display:flex; gap:2.5rem; align-items:flex-end; }
+    .hf-link {
+      position:relative; padding-bottom:2px;
+      font-size:1rem; font-weight:400; color:var(--mint);
+    }
+    .hf-link::after {
+      content:''; position:absolute; bottom:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .45s cubic-bezier(.215,.61,.355,1);
+    }
+    .hf-link:hover::after { transform:scaleX(1); }
+    .hero-footer-center { text-align:center; }
+    .hero-footer-right  { text-align:right; }
+    .fl { font-size:1rem; font-weight:400; display:block; line-height:1.3; }
+    .fs { font-size:.85rem; color:var(--dim); display:block; line-height:1.4; margin-top:2px; }
+    .avail-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:#22c55e; margin-right:5px; animation:blink 2s infinite; vertical-align:middle; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ══════════════════════════════════
+       SCROLL REVEAL SYSTEM
+    ══════════════════════════════════ */
+    .sr {
+      opacity:0; transform:translateY(60px);
+      transition: opacity .85s cubic-bezier(.215,.61,.355,1), transform .85s cubic-bezier(.215,.61,.355,1);
+    }
+    .sr.on { opacity:1; transform:none; }
+    .sr-left {
+      opacity:0; transform:translateX(-50px);
+      transition: opacity .8s cubic-bezier(.215,.61,.355,1), transform .8s cubic-bezier(.215,.61,.355,1);
+    }
+    .sr-left.on { opacity:1; transform:none; }
+    .sr-right {
+      opacity:0; transform:translateX(50px);
+      transition: opacity .8s cubic-bezier(.215,.61,.355,1), transform .8s cubic-bezier(.215,.61,.355,1);
+    }
+    .sr-right.on { opacity:1; transform:none; }
+
+    /* ══════════════════════════════════
+       SECTION HEADER
+    ══════════════════════════════════ */
+    .sec-header { margin-bottom:5rem; }
+    .sec-eyebrow {
+      display:inline-flex; align-items:center; gap:.7rem;
+      font-size:.72rem; font-weight:500; letter-spacing:.18em;
+      text-transform:uppercase; color:var(--mint); opacity:.5;
+      margin-bottom:1rem;
+    }
+    .sec-eyebrow::before {
+      content:''; display:block; width:28px; height:1px; background:var(--mint); opacity:.6;
+    }
+    .sec-title {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(3.5rem,7vw,8rem);
+      line-height:.88; letter-spacing:-.01em;
+      text-transform:uppercase; color:var(--mint);
+    }
+
+    /* ══════════════════════════════════
+       WORKS
+    ══════════════════════════════════ */
+    #works { padding:0 7.5rem; margin-bottom:4rem; }
+    .project-list { list-style:none; }
+    .project-item {
+      display:block; position:relative; padding:5.5rem 0; color:var(--mint);
+    }
+    .project-item::before {
+      content:''; position:absolute; top:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .8s cubic-bezier(.215,.61,.355,1);
+    }
+    .project-item.border-on::before { transform:scaleX(1); }
+    .project-item:last-of-type::after {
+      content:''; position:absolute; bottom:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .8s cubic-bezier(.215,.61,.355,1) .1s;
+    }
+    .project-item:last-of-type.border-on::after { transform:scaleX(1); }
+    .project-grid {
+      display:grid; grid-template-columns:42% 1fr; gap:5%; align-items:center;
+    }
+    .project-grid.reverse { grid-template-columns:1fr 42%; }
+    .project-grid.reverse .project-thumb { order:2; }
+    .project-grid.reverse .project-body  { order:1; }
+    .project-thumb {
+      position:relative; border-radius:6px; overflow:hidden;
+      box-shadow:0 0 0 1px var(--border);
+      transition:box-shadow .5s ease, transform .5s cubic-bezier(.215,.61,.355,1);
+    }
+    .project-item:hover .project-thumb {
+      box-shadow:0 16px 56px rgba(197,240,201,.12), 0 0 0 1px rgba(197,240,201,.4);
+      transform:translateY(-4px);
+    }
+    .project-thumb svg { display:block; width:100%; height:auto; }
+    .project-body { display:flex; flex-direction:column; gap:1.6rem; }
+    .project-meta { display:flex; align-items:center; gap:.9rem; }
+    .project-num  { font-size:.75rem; color:var(--dim); font-variant-numeric:tabular-nums; letter-spacing:.06em; }
+    .project-type { font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); border:1px solid var(--border); padding:3px 10px; border-radius:3px; }
+    .project-title {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(2.8rem,5.5vw,6.5rem);
+      line-height:.85; letter-spacing:-.01em;
+      text-transform:uppercase; color:var(--mint);
+      transition:letter-spacing .4s ease;
+    }
+    .project-item:hover .project-title { letter-spacing:.015em; }
+    .project-desc { font-size:.9rem; color:var(--dim); line-height:1.75; max-width:500px; font-weight:300; }
+    .project-metrics { display:flex; gap:2rem; }
+    .pm { display:flex; flex-direction:column; gap:.2rem; }
+    .pm-val { font-family:'Bebas Neue',Impact,sans-serif; font-size:2.4rem; line-height:1; color:var(--mint); letter-spacing:-.01em; }
+    .pm-lbl { font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); }
+    .project-tags { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .ptag {
+      font-size:.7rem; font-family:'Inter',sans-serif;
+      color:var(--dim); border:1px solid var(--border);
+      padding:3px 10px; border-radius:3px; letter-spacing:.03em;
+      transition:border-color .25s, color .25s;
+    }
+    .project-item:hover .ptag { border-color:rgba(197,240,201,.3); color:var(--mint); }
+    .project-gh {
+      display:inline-flex; align-items:center; gap:.5rem;
+      font-size:.8rem; color:var(--dim); letter-spacing:.04em;
+      transition:color .25s; width:fit-content;
+    }
+    .project-gh svg { width:14px; height:14px; }
+    .project-item:hover .project-gh { color:var(--mint); }
+    .project-gh::after {
+      content:''; display:block; height:1px; width:0;
+      background:var(--mint); margin-top:1px;
+      transition:width .4s cubic-bezier(.215,.61,.355,1);
+    }
+    .project-item:hover .project-gh::after { width:100%; }
+
+    /* ══════════════════════════════════
+       EMOJI PARTICLES (hero)
+    ══════════════════════════════════ */
+    #emoji-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+    .ep {
+      position:absolute; pointer-events:auto; cursor:pointer;
+      user-select:none; will-change:left, top; line-height:1; transition:filter .2s;
+    }
+    .ep:hover { filter:brightness(1.5) drop-shadow(0 0 8px rgba(197,240,201,.6)); }
+    .ep.pop { animation:epop .35s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes epop { 0%{transform:scale(1)} 50%{transform:scale(1.7)} 100%{transform:scale(1)} }
+
+    /* ══════════════════════════════════
+       SKILLS
+    ══════════════════════════════════ */
+    #skills { padding:9rem 7.5rem; }
+    .skills-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; }
+    .skill-card {
+      padding:2.4rem 2rem; border:1px solid var(--border); border-radius:8px;
+      transition:background .35s, border-color .35s, transform .35s;
+      display:flex; flex-direction:column; gap:1.4rem;
+    }
+    .skill-card:hover {
+      background:var(--mintd); border-color:rgba(197,240,201,.4); transform:translateY(-5px);
+    }
+    .sk-header { display:flex; align-items:center; gap:1rem; }
+    .sk-icon { font-size:1.8rem; line-height:1; flex-shrink:0; }
+    .sk-title { font-size:.95rem; font-weight:600; letter-spacing:.01em; color:var(--mint); line-height:1.2; }
+    .sk-pills { display:flex; flex-wrap:wrap; gap:.45rem; }
+    .sk-pill {
+      font-size:.72rem; font-family:'Inter',sans-serif;
+      padding:4px 11px; border-radius:100px;
+      border:1px solid var(--border); color:var(--dim);
+      transition:border-color .25s, color .25s, background .25s;
+    }
+    .skill-card:hover .sk-pill { border-color:rgba(197,240,201,.32); color:var(--mint); }
+    .sk-pill.highlight {
+      background:rgba(197,240,201,.12); border-color:rgba(197,240,201,.4); color:var(--mint);
+    }
+
+    /* ══════════════════════════════════
+       JOURNEY TIMELINE
+    ══════════════════════════════════ */
+    #journey { padding:9rem 7.5rem; border-top:1px solid var(--border); }
+
+    .timeline {
+      position:relative;
+      padding-left:3rem;
+      margin-top:1rem;
+    }
+    .timeline::before {
+      content:''; position:absolute;
+      left:0; top:0; bottom:0;
+      width:1px; background:var(--border);
+    }
+
+    .tl-entry {
+      position:relative;
+      margin-bottom:3.5rem;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tl-dot {
+      position:absolute; left:-3.55rem; top:.45rem;
+      width:11px; height:11px; border-radius:50%;
+      background:var(--bg); border:2px solid rgba(197,240,201,.45);
+      transition:background .25s, border-color .25s, box-shadow .25s;
+    }
+    .tl-entry:hover .tl-dot,
+    .tl-entry.open   .tl-dot {
+      background:var(--mint); border-color:var(--mint);
+      box-shadow:0 0 14px rgba(197,240,201,.5);
+    }
+    .tl-header { display:flex; flex-direction:column; gap:.25rem; }
+    .tl-date {
+      font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--dim);
+    }
+    .tl-title {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(1.6rem,2.8vw,2.5rem);
+      line-height:1; color:var(--mint);
+      transition:letter-spacing .3s ease;
+    }
+    .tl-entry:hover .tl-title,
+    .tl-entry.open   .tl-title { letter-spacing:.02em; }
+    .tl-org { font-size:.86rem; color:var(--dim); margin-top:.25rem; }
+    .tl-tag {
+      display:inline-block; margin-top:.5rem;
+      font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
+      border:1px solid var(--border); color:var(--dim);
+      padding:2px 9px; border-radius:3px;
+    }
+
+    /* ── Comic Bubble ── */
+    .tl-bubble {
+      display:none;
+      position:relative;
+      margin-top:1.4rem;
+      background:var(--bg2);
+      border:1.5px solid rgba(197,240,201,.35);
+      border-radius:12px;
+      padding:1.8rem 2rem;
+      max-width:740px;
+      box-shadow:0 16px 64px rgba(0,0,0,.55), 0 0 0 1px var(--border);
+      z-index:10;
+    }
+    .tl-entry.open .tl-bubble { display:block; animation:bubbleIn .32s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes bubbleIn {
+      from { opacity:0; transform:translateY(10px) scale(.97); }
+      to   { opacity:1; transform:none; }
+    }
+    /* speech-bubble tail */
+    .tl-bubble::before {
+      content:''; position:absolute;
+      top:-9px; left:2.2rem;
+      border-left:9px solid transparent;
+      border-right:9px solid transparent;
+      border-bottom:9px solid rgba(197,240,201,.35);
+    }
+    .tl-bubble::after {
+      content:''; position:absolute;
+      top:-7px; left:2.35rem;
+      border-left:8px solid transparent;
+      border-right:8px solid transparent;
+      border-bottom:8px solid var(--bg2);
+    }
+
+    .bubble-cols {
+      display:grid;
+      grid-template-columns:1fr 260px;
+      gap:1.6rem;
+      align-items:start;
+    }
+    .bubble-info h3 {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:1.55rem; color:var(--mint);
+      margin-bottom:.3rem;
+    }
+    .bubble-info .b-org {
+      font-size:.82rem; color:var(--dim); margin-bottom:.9rem;
+    }
+    .bubble-pts {
+      list-style:none; display:flex; flex-direction:column; gap:.55rem;
+    }
+    .bubble-pts li {
+      font-size:.84rem; color:var(--dim); line-height:1.55;
+      padding-left:1.1rem; position:relative;
+    }
+    .bubble-pts li::before {
+      content:'▸'; position:absolute; left:0;
+      color:var(--mint); font-size:.68rem; top:3px;
+    }
+    .bubble-map {
+      height:210px; border-radius:8px;
+      border:1px solid var(--border); overflow:hidden;
+    }
+    /* Override leaflet tile filter for dark theme */
+    .bubble-map .leaflet-tile { filter:brightness(.75) invert(1) hue-rotate(180deg) saturate(.6); }
+    .bubble-map .leaflet-container { background:#111; }
+
+    @media(max-width:1100px) {
+      #works,#skills,#contact,#journey { padding-left:4rem; padding-right:4rem; }
+      .project-title { font-size:clamp(2.4rem,5vw,4.5rem); }
+    }
+    @media(max-width:860px) {
+      .hero-name { font-size:clamp(56px,15vw,110px); }
+      .hero-footer { left:2rem; width:calc(100% - 4rem); bottom:2.5rem; }
+      .hero-footer-center,.hero-footer-right { display:none; }
+      #works,#skills,#contact,#journey { padding-left:1.8rem; padding-right:1.8rem; }
+      .project-grid,.project-grid.reverse { grid-template-columns:1fr; }
+      .project-grid.reverse .project-thumb { order:0; }
+      .project-grid.reverse .project-body  { order:0; }
+      .project-item { padding:3.5rem 0; }
+      .skills-grid { grid-template-columns:1fr 1fr; }
+      .bubble-cols { grid-template-columns:1fr; }
+      .bubble-map { height:170px; }
+    }
+    @media(max-width:560px) {
+      .skills-grid { grid-template-columns:1fr; }
+      .project-metrics { gap:1.2rem; }
+      .contact-links { gap:1.2rem; }
+      .timeline { padding-left:2rem; }
+      .tl-dot { left:-2.5rem; }
+    }
+
+    /* ══════════════════════════════════
+       CONTACT
+    ══════════════════════════════════ */
+    #contact {
+      padding:8rem 7.5rem 10rem;
+      border-top:1px solid var(--border);
+      display:flex; flex-direction:column; align-items:center;
+      gap:3.5rem; text-align:center;
+    }
+    .contact-heading {
+      font-family:'Bebas Neue',Impact,sans-serif;
+      font-size:clamp(3.5rem,8vw,10rem);
+      line-height:.85; text-transform:uppercase; letter-spacing:-.01em;
+    }
+    .contact-heading span { opacity:.3; }
+    .contact-btn {
+      display:inline-flex; align-items:center; gap:.9rem;
+      padding:1.1rem 2.6rem; border:1px solid rgba(197,240,201,.3);
+      border-radius:4px; font-size:.95rem; font-weight:500;
+      color:var(--mint); letter-spacing:.06em; text-transform:uppercase;
+      transition:background .3s, border-color .3s, box-shadow .3s, transform .3s;
+    }
+    .contact-btn:hover {
+      background:var(--mintd); border-color:var(--mint);
+      box-shadow:0 0 32px rgba(197,240,201,.1); transform:translateY(-2px);
+    }
+    .contact-btn svg { width:20px; height:20px; }
+    .contact-links { display:flex; gap:2rem; flex-wrap:wrap; justify-content:center; }
+    .contact-link {
+      font-size:.9rem; color:var(--dim);
+      display:flex; align-items:center; gap:.5rem;
+      position:relative; padding-bottom:2px; transition:color .25s;
+    }
+    .contact-link::after {
+      content:''; position:absolute; bottom:0; left:0;
+      width:100%; height:1px; background:var(--mint);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .35s cubic-bezier(.215,.61,.355,1);
+    }
+    .contact-link:hover { color:var(--mint); }
+    .contact-link:hover::after { transform:scaleX(1); }
+    .contact-link svg { width:15px; height:15px; }
+    .footer-copy { font-size:.78rem; color:var(--mint); opacity:.2; font-weight:300; }
+  </style>
+</head>
+<body>
+
+<div id="loader"></div>
+<canvas id="bg"></canvas>
+
+<main>
+
+<!-- ══════════════════════════════════
+     HERO
+══════════════════════════════════ -->
+<section id="hero">
+  <div id="emoji-bg"></div>
+  <h1 class="hero-name" style="position:relative;z-index:1">Marwane<br/>Boubekeur</h1>
+  <div class="hero-footer">
+    <div class="hero-footer-left">
+      <a href="#works"   class="hf-link">Works</a>
+      <a href="#skills"  class="hf-link">Skills</a>
+      <a href="#journey" class="hf-link">Journey</a>
+      <a href="#contact" class="hf-link">Contact</a>
+    </div>
+    <div class="hero-footer-center">
+      <span class="fl">Data &amp; Sport Scientist</span>
+      <span class="fs"><span class="avail-dot"></span>Available from 2026</span>
+    </div>
+    <div class="hero-footer-right">
+      <span class="fl">M.Eng. Data &amp; AI — ECE Paris</span>
+      <span class="fs">Paris, France</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     WORKS
+══════════════════════════════════ -->
+<section id="works">
+  <div class="sec-header sr">
+    <p class="sec-eyebrow">Selected Projects</p>
+    <h2 class="sec-title">Works</h2>
+  </div>
+  <ul class="project-list">
+
+    <!-- ── 01 NBA ── -->
+    <li class="project-item">
+      <div class="project-grid">
+        <div class="project-thumb sr-left">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#0a1a10;display:block">
+            <defs>
+              <pattern id="grid1" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(197,240,201,.05)" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="480" height="320" fill="url(#grid1)"/>
+            <text x="30" y="24" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">ROC CURVE — GRADIENT BOOSTING</text>
+            <line x1="50" y1="36" x2="50" y2="210" stroke="rgba(197,240,201,.2)" stroke-width="1"/>
+            <line x1="50" y1="210" x2="260" y2="210" stroke="rgba(197,240,201,.2)" stroke-width="1"/>
+            <line x1="50" y1="210" x2="260" y2="36" stroke="rgba(197,240,201,.12)" stroke-dasharray="5,4" stroke-width="1"/>
+            <polygon points="50,210 76,175 100,145 122,118 148,96 172,78 196,63 222,51 244,40 260,36 260,210" fill="rgba(197,240,201,.07)"/>
+            <polyline points="50,210 76,175 100,145 122,118 148,96 172,78 196,63 222,51 244,40 260,36" fill="none" stroke="#c5f0c9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="148" cy="96" r="4" fill="#c5f0c9" opacity=".8"/>
+            <circle cx="196" cy="63" r="4" fill="#c5f0c9" opacity=".8"/>
+            <rect x="160" y="168" width="90" height="26" rx="4" fill="#0d201a" stroke="rgba(197,240,201,.3)"/>
+            <text x="205" y="184" font-size="11" fill="#c5f0c9" text-anchor="middle" font-family="monospace">AUC = 0.76</text>
+            <text x="155" y="226" font-size="8" fill="#c5f0c9" text-anchor="middle" opacity=".3">False Positive Rate</text>
+            <text x="22" y="124" font-size="8" fill="#c5f0c9" text-anchor="middle" opacity=".3" transform="rotate(-90,22,124)">True Positive Rate</text>
+            <text x="290" y="24" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">RISK TIERS</text>
+            <rect x="290" y="36" width="168" height="52" rx="4" fill="rgba(231,76,60,.12)" stroke="rgba(231,76,60,.4)"/>
+            <text x="306" y="58" font-size="11" fill="#e74c3c" font-weight="600">HIGH RISK  ≥ 0.55</text>
+            <text x="306" y="76" font-size="9" fill="#e74c3c" opacity=".7">→ Recommended rest</text>
+            <rect x="290" y="98" width="168" height="52" rx="4" fill="rgba(243,156,18,.10)" stroke="rgba(243,156,18,.35)"/>
+            <text x="306" y="120" font-size="11" fill="#f39c12" font-weight="600">MEDIUM  0.35 – 0.55</text>
+            <text x="306" y="138" font-size="9" fill="#f39c12" opacity=".7">→ Enhanced monitoring</text>
+            <rect x="290" y="160" width="168" height="52" rx="4" fill="rgba(197,240,201,.07)" stroke="rgba(197,240,201,.25)"/>
+            <text x="306" y="182" font-size="11" fill="#c5f0c9" font-weight="600">LOW RISK   &lt; 0.35</text>
+            <text x="306" y="200" font-size="9" fill="#c5f0c9" opacity=".7">→ Cleared to play</text>
+            <text x="30" y="248" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">TOP SHAP FEATURES</text>
+            <g font-size="8" fill="#c5f0c9" opacity=".5" font-family="monospace">
+              <text x="30" y="268">ACWR</text>
+              <text x="30" y="284">Minutes/game</text>
+              <text x="30" y="300">Age</text>
+              <text x="30" y="316">Days rest</text>
+            </g>
+            <rect x="115" y="258" width="148" height="8" rx="2" fill="rgba(197,240,201,.6)"/>
+            <rect x="115" y="274" width="110" height="8" rx="2" fill="rgba(197,240,201,.45)"/>
+            <rect x="115" y="290" width="80"  height="8" rx="2" fill="rgba(197,240,201,.3)"/>
+            <rect x="115" y="306" width="58"  height="8" rx="2" fill="rgba(197,240,201,.22)"/>
+          </svg>
+        </div>
+        <div class="project-body sr-right">
+          <div class="project-meta sr"><span class="project-num">01</span><span class="project-type">ML · Sports Science</span></div>
+          <h2 class="project-title sr">NBA Injury<br/>Risk</h2>
+          <p class="project-desc sr">End-to-end machine learning pipeline predicting individual NBA player injury risk from historical workload and performance data. Uses temporal train/test split to prevent data leakage, 18+ engineered features including ACWR rolling averages, and SHAP values to give coaching staff actionable explanations.</p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">0.76</span><span class="pm-lbl">ROC-AUC</span></div>
+            <div class="pm"><span class="pm-val">18+</span><span class="pm-lbl">Features</span></div>
+            <div class="pm"><span class="pm-val">3</span><span class="pm-lbl">Risk tiers</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">Python</span><span class="ptag">XGBoost</span><span class="ptag">SHAP</span><span class="ptag">Temporal CV</span><span class="ptag">pandas</span><span class="ptag">scikit-learn</span>
+          </div>
+          <a href="https://github.com/Warmvne/NBA-Project" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 02 Football CV ── -->
+    <li class="project-item">
+      <div class="project-grid reverse">
+        <div class="project-thumb sr-right">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#081510;display:block">
+            <defs><pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(197,240,201,.04)" stroke-width="1"/></pattern></defs>
+            <rect width="480" height="320" fill="url(#grid2)"/>
+            <rect x="20" y="18" width="440" height="284" rx="3" fill="rgba(197,240,201,.02)" stroke="rgba(197,240,201,.22)" stroke-width="1.2"/>
+            <line x1="240" y1="18" x2="240" y2="302" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <circle cx="240" cy="160" r="32" fill="none" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <rect x="20"  y="88" width="70" height="124" fill="none" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <rect x="390" y="88" width="70" height="124" fill="none" stroke="rgba(197,240,201,.15)" stroke-width=".8"/>
+            <polygon points="20,18 120,18 96,78 56,100 20,86"     fill="rgba(197,240,201,.11)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="120,18 240,18 240,74 172,94 96,78"   fill="rgba(197,240,201,.08)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="56,100 96,78 172,94 154,168 84,182 40,170" fill="rgba(197,240,201,.07)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="146,246 240,210 240,302 20,302 20,238 52,238" fill="rgba(197,240,201,.09)" stroke="rgba(197,240,201,.28)" stroke-width=".7"/>
+            <polygon points="240,18 350,18 336,74 280,90 240,74"  fill="rgba(100,200,255,.08)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <polygon points="350,18 460,18 460,78 400,96 336,74"  fill="rgba(100,200,255,.10)" stroke="rgba(100,200,255,.22)" stroke-width=".7"/>
+            <circle cx="46"  cy="44"  r="7" fill="#c5f0c9"/>
+            <circle cx="190" cy="50"  r="7" fill="#c5f0c9"/>
+            <circle cx="84"  cy="140" r="7" fill="#c5f0c9"/>
+            <circle cx="148" cy="108" r="7" fill="#c5f0c9"/>
+            <circle cx="148" cy="180" r="7" fill="#c5f0c9"/>
+            <circle cx="286" cy="50"  r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="420" cy="44"  r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="314" cy="108" r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="360" cy="140" r="7" fill="rgba(100,200,255,.9)"/>
+            <circle cx="240" cy="160" r="6" fill="white" stroke="#081510" stroke-width="1.5"/>
+            <text x="240" y="314" font-size="8" fill="#c5f0c9" text-anchor="middle" opacity=".35" font-family="monospace">YOLOv8 + ByteTrack · Bird's Eye View · Voronoi Space Control</text>
+          </svg>
+        </div>
+        <div class="project-body sr-left">
+          <div class="project-meta sr"><span class="project-num">02</span><span class="project-type">Computer Vision · Football</span></div>
+          <h2 class="project-title sr">Football<br/>Vision</h2>
+          <p class="project-desc sr">Full computer vision pipeline for association football: player and ball detection with YOLOv8, multi-object tracking via ByteTrack, homography-based bird's-eye view, Voronoi space control, automated formation detection, R3D-18 action recognition, and biomechanical shooting analysis with MediaPipe.</p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">52%</span><span class="pm-lbl">Space ctrl</span></div>
+            <div class="pm"><span class="pm-val">7</span><span class="pm-lbl">Actions</span></div>
+            <div class="pm"><span class="pm-val">RT</span><span class="pm-lbl">Tracking</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">YOLOv8</span><span class="ptag">ByteTrack</span><span class="ptag">OpenCV</span><span class="ptag">MediaPipe</span><span class="ptag">R3D-18</span><span class="ptag">Homography</span>
+          </div>
+          <a href="https://github.com/Warmvne/Football_ComputerVision" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 03 Basketball CV ── -->
+    <li class="project-item">
+      <div class="project-grid">
+        <div class="project-thumb sr-left">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#080e12;display:block">
+            <defs>
+              <radialGradient id="heatmap" cx="50%" cy="30%" r="50%"><stop offset="0%" stop-color="#c5f0c9" stop-opacity=".35"/><stop offset="60%" stop-color="#c5f0c9" stop-opacity=".12"/><stop offset="100%" stop-color="#c5f0c9" stop-opacity="0"/></radialGradient>
+              <radialGradient id="hm3pt" cx="50%" cy="100%" r="60%"><stop offset="0%" stop-color="#c5f0c9" stop-opacity=".18"/><stop offset="100%" stop-color="#c5f0c9" stop-opacity="0"/></radialGradient>
+            </defs>
+            <rect x="16" y="10" width="448" height="300" rx="3" fill="none" stroke="rgba(197,240,201,.2)" stroke-width="1.2"/>
+            <rect x="170" y="10" width="140" height="88" fill="rgba(197,240,201,.03)" stroke="rgba(197,240,201,.18)" stroke-width="1"/>
+            <circle cx="240" cy="98" r="46" fill="none" stroke="rgba(197,240,201,.18)" stroke-width="1" stroke-dasharray="5,4"/>
+            <circle cx="240" cy="28" r="10" fill="none" stroke="rgba(197,240,201,.5)" stroke-width="1.5"/>
+            <line x1="215" y1="16" x2="265" y2="16" stroke="rgba(197,240,201,.4)" stroke-width="2.5"/>
+            <path d="M 56 145 A 195 195 0 0 1 424 145" fill="none" stroke="rgba(197,240,201,.18)" stroke-width="1"/>
+            <ellipse cx="240" cy="50" rx="80" ry="60" fill="url(#heatmap)"/>
+            <ellipse cx="240" cy="220" rx="200" ry="80" fill="url(#hm3pt)"/>
+            <circle cx="240" cy="50"  r="7.5" fill="#c5f0c9" opacity=".95"/>
+            <circle cx="222" cy="62"  r="6.5" fill="#c5f0c9" opacity=".85"/>
+            <circle cx="258" cy="60"  r="6.5" fill="#c5f0c9" opacity=".85"/>
+            <circle cx="96"  cy="92"  r="6" fill="#c5f0c9" opacity=".65"/>
+            <circle cx="384" cy="88"  r="6" fill="#c5f0c9" opacity=".65"/>
+            <circle cx="110" cy="200" r="6" fill="#c5f0c9" opacity=".55"/>
+            <circle cx="370" cy="200" r="6" fill="#c5f0c9" opacity=".55"/>
+            <g stroke="rgba(197,240,201,.3)" stroke-width="1.8">
+              <line x1="132" y1="68" x2="142" y2="78"/><line x1="142" y1="68" x2="132" y2="78"/>
+              <line x1="338" y1="68" x2="348" y2="78"/><line x1="348" y1="68" x2="338" y2="78"/>
+            </g>
+            <text x="240" y="315" font-size="8" fill="#c5f0c9" opacity=".35" text-anchor="middle" font-family="monospace">Shot Chart + MediaPipe BEEF Analysis</text>
+          </svg>
+        </div>
+        <div class="project-body sr-right">
+          <div class="project-meta sr"><span class="project-num">03</span><span class="project-type">Computer Vision · Basketball</span></div>
+          <h2 class="project-title sr">Basketball<br/>Vision</h2>
+          <p class="project-desc sr">NBA computer vision system combining shooting mechanics (BEEF principle — elbow angle, knee valgus via MediaPipe), offensive spacing from Voronoi and convex hull, ball movement graph analysis with NetworkX, and R3D-18 action recognition across 7 NBA action classes.</p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">7</span><span class="pm-lbl">Action classes</span></div>
+            <div class="pm"><span class="pm-val">142°</span><span class="pm-lbl">Elbow angle</span></div>
+            <div class="pm"><span class="pm-val">BEEF</span><span class="pm-lbl">Biomechanics</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">YOLOv8</span><span class="ptag">MediaPipe</span><span class="ptag">R3D-18</span><span class="ptag">NetworkX</span><span class="ptag">scipy</span><span class="ptag">nba_api</span>
+          </div>
+          <a href="https://github.com/Warmvne/Basketball_ComputerVision" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 04 Curriculum ── -->
+    <li class="project-item">
+      <div class="project-grid reverse">
+        <div class="project-thumb sr-right">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#0a0f0a;display:block">
+            <rect width="480" height="320" rx="0" fill="#0f1a0f"/>
+            <rect width="480" height="32" fill="#1a2a1a"/>
+            <circle cx="18" cy="16" r="5.5" fill="#ff5f56"/>
+            <circle cx="34" cy="16" r="5.5" fill="#ffbd2e"/>
+            <circle cx="50" cy="16" r="5.5" fill="#27c93f"/>
+            <text x="240" y="21" font-size="10" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">sport_scientist_curriculum.ipynb</text>
+            <line x1="110" y1="32" x2="110" y2="320" stroke="rgba(197,240,201,.1)" stroke-width="1"/>
+            <text x="12" y="56"  font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 01_statistics</text>
+            <text x="12" y="72"  font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 02_machine_learning</text>
+            <text x="12" y="88"  font-size="8" fill="rgba(197,240,201,.35)" font-family="monospace">📁 03_python</text>
+            <text x="12" y="120" font-size="8" fill="rgba(197,240,201,.55)" font-family="monospace">▸ 05_football</text>
+            <text x="20" y="136" font-size="7.5" fill="rgba(197,240,201,.7)"  font-family="monospace">  xg_model.ipynb</text>
+            <rect x="0" y="128" width="4" height="14" fill="#c5f0c9"/>
+            <rect x="122" y="44" width="346" height="38" rx="3" fill="rgba(197,240,201,.04)" stroke="rgba(197,240,201,.12)"/>
+            <text x="134" y="60" font-size="9" fill="#c5f0c9" opacity=".6" font-family="monospace">## Expected Goals (xG) Model</text>
+            <text x="134" y="76" font-size="8" fill="rgba(197,240,201,.4)" font-family="monospace">StatsBomb open data · Logistic Regression baseline</text>
+            <rect x="122" y="92" width="346" height="90" rx="3" fill="rgba(197,240,201,.03)" stroke="rgba(197,240,201,.1)"/>
+            <text x="145" y="110" font-size="8" font-family="monospace"><tspan fill="#7ec8e3">import</tspan><tspan fill="rgba(197,240,201,.7)"> pandas as pd</tspan></text>
+            <text x="145" y="124" font-size="8" font-family="monospace"><tspan fill="#7ec8e3">from</tspan><tspan fill="rgba(197,240,201,.7)"> statsbombpy </tspan><tspan fill="#7ec8e3">import</tspan><tspan fill="rgba(197,240,201,.7)"> sb</tspan></text>
+            <rect x="130" y="292" width="58" height="20" rx="3" fill="rgba(197,240,201,.1)" stroke="rgba(197,240,201,.2)"/>
+            <text x="159" y="305" font-size="8" fill="#c5f0c9" text-anchor="middle" font-family="monospace">37 notebooks</text>
+            <rect x="196" y="292" width="52" height="20" rx="3" fill="rgba(197,240,201,.1)" stroke="rgba(197,240,201,.2)"/>
+            <text x="222" y="305" font-size="8" fill="#c5f0c9" text-anchor="middle" font-family="monospace">6 months</text>
+          </svg>
+        </div>
+        <div class="project-body sr-left">
+          <div class="project-meta sr"><span class="project-num">04</span><span class="project-type">Education · Open Source</span></div>
+          <h2 class="project-title sr">Sport Sci<br/>Curriculum</h2>
+          <p class="project-desc sr">Open-source 6-month self-directed learning programme covering statistics, ML theory, Python, R, football analytics (StatsBomb, xG modeling), and basketball analytics (NBA advanced metrics, tracking data). 37 structured notebooks with exercises — designed for aspiring sport scientists with no prior coding background.</p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">37</span><span class="pm-lbl">Notebooks</span></div>
+            <div class="pm"><span class="pm-val">6</span><span class="pm-lbl">Months</span></div>
+            <div class="pm"><span class="pm-val">2</span><span class="pm-lbl">Languages</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">Python</span><span class="ptag">R</span><span class="ptag">StatsBomb</span><span class="ptag">Jupyter</span><span class="ptag">ggplot2</span><span class="ptag">tidyverse</span>
+          </div>
+          <a href="https://github.com/Warmvne/SportScientist-Curriculum" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 05 BrainBridge ── -->
+    <li class="project-item">
+      <div class="project-grid">
+        <div class="project-thumb sr-left">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#0c120c;display:block">
+            <rect x="60" y="16" width="360" height="288" rx="8" fill="#161e16" stroke="rgba(197,240,201,.15)" stroke-width="1"/>
+            <rect x="60" y="16" width="360" height="36" rx="8 8 0 0" fill="#1c261c"/>
+            <circle cx="82" cy="34" r="5" fill="rgba(255,255,255,.12)"/>
+            <circle cx="98" cy="34" r="5" fill="rgba(255,255,255,.12)"/>
+            <circle cx="114" cy="34" r="5" fill="rgba(255,255,255,.12)"/>
+            <rect x="130" y="25" width="220" height="18" rx="9" fill="rgba(197,240,201,.06)"/>
+            <text x="240" y="37" font-size="8" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">claude.ai/chat</text>
+            <circle cx="368" cy="34" r="8" fill="rgba(197,240,201,.15)" stroke="rgba(197,240,201,.3)" stroke-width="1"/>
+            <text x="368" y="38" font-size="8" fill="#c5f0c9" text-anchor="middle" font-weight="bold">B</text>
+            <rect x="268" y="46" width="142" height="196" rx="8" fill="#1a2e1a" stroke="rgba(197,240,201,.4)" stroke-width="1.2"/>
+            <rect x="268" y="46" width="142" height="32" rx="8 8 0 0" fill="#213221"/>
+            <text x="280" y="66" font-size="9" fill="#c5f0c9" font-weight="600" font-family="monospace">🧠 BrainBridge</text>
+            <rect x="278" y="84" width="122" height="90" rx="4" fill="rgba(197,240,201,.04)" stroke="rgba(197,240,201,.15)"/>
+            <text x="339" y="102" font-size="8" fill="rgba(197,240,201,.4)" text-anchor="middle" font-family="monospace">QUICK MATH</text>
+            <text x="339" y="126" font-size="20" fill="#c5f0c9" text-anchor="middle" font-family="monospace" font-weight="bold">8 × 7 = ?</text>
+            <rect x="322" y="144" width="30" height="22" rx="3" fill="rgba(197,240,201,.25)" stroke="rgba(197,240,201,.5)"/>
+            <text x="337" y="159" font-size="9" fill="#c5f0c9" text-anchor="middle" font-family="monospace">56</text>
+            <circle cx="82" cy="289" r="4" fill="#22c55e"/>
+            <text x="92" y="293" font-size="8" fill="rgba(197,240,201,.4)" font-family="monospace">API request intercepted · Cognitive game launched</text>
+          </svg>
+        </div>
+        <div class="project-body sr-right">
+          <div class="project-meta sr"><span class="project-num">05</span><span class="project-type">Chrome Extension · JS</span></div>
+          <h2 class="project-title sr">Brain<br/>Bridge</h2>
+          <p class="project-desc sr">Chrome extension that intercepts outgoing API requests to AI services (Claude, ChatGPT, Gemini) and automatically launches short cognitive mini-games during the wait period. Eliminates passive idle time, keeps the user mentally engaged, and improves the subjective experience of working with AI tools.</p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">0ms</span><span class="pm-lbl">Idle time</span></div>
+            <div class="pm"><span class="pm-val">API</span><span class="pm-lbl">Intercept</span></div>
+            <div class="pm"><span class="pm-val">3+</span><span class="pm-lbl">Game modes</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">JavaScript</span><span class="ptag">Chrome API</span><span class="ptag">WebExtensions</span><span class="ptag">Service Worker</span>
+          </div>
+          <a href="https://github.com/Warmvne/BrainBridge" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <!-- ── 06 Acoustic ── -->
+    <li class="project-item">
+      <div class="project-grid reverse">
+        <div class="project-thumb sr-right">
+          <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" style="background:#080d08;display:block">
+            <defs>
+              <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="rgba(197,240,201,0)"/>
+                <stop offset="60%"  stop-color="rgba(197,240,201,.5)"/>
+                <stop offset="100%" stop-color="#c5f0c9"/>
+              </linearGradient>
+            </defs>
+            <text x="20" y="24" font-size="9" fill="#c5f0c9" opacity=".4" font-family="monospace" letter-spacing="2">ROOM IMPULSE RESPONSE ANALYSIS</text>
+            <g stroke="rgba(197,240,201,.07)" stroke-width=".6">
+              <line x1="40" y1="40"  x2="460" y2="40"/>
+              <line x1="40" y1="84"  x2="460" y2="84"/>
+              <line x1="40" y1="128" x2="460" y2="128"/>
+              <line x1="40" y1="172" x2="460" y2="172"/>
+              <line x1="40" y1="216" x2="460" y2="216"/>
+              <line x1="40" y1="260" x2="460" y2="260"/>
+            </g>
+            <rect x="40"  y="260" width="30" height="40" fill="rgba(197,240,201,.55)"/>
+            <rect x="70"  y="260" width="25" height="40" fill="rgba(197,240,201,.70)"/>
+            <rect x="95"  y="260" width="20" height="40" fill="rgba(197,240,201,.85)"/>
+            <rect x="40"  y="216" width="30" height="44" fill="rgba(197,240,201,.35)"/>
+            <rect x="70"  y="216" width="25" height="44" fill="rgba(197,240,201,.55)"/>
+            <rect x="95"  y="216" width="20" height="44" fill="rgba(197,240,201,.75)"/>
+            <rect x="264" y="260" width="196" height="40" fill="url(#sg)"/>
+            <polyline points="40,170 55,155 65,140 78,128 100,110 120,100 140,118 175,94 200,106 250,118 300,121 390,122 460,122" fill="none" stroke="#c5f0c9" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
+            <text x="240" y="316" font-size="8" fill="rgba(197,240,201,.3)" text-anchor="middle" font-family="monospace">Time (ms)</text>
+          </svg>
+        </div>
+        <div class="project-body sr-left">
+          <div class="project-meta sr"><span class="project-num">06</span><span class="project-type">Hackathon · Signal Processing</span></div>
+          <h2 class="project-title sr">Acoustic<br/>Localization</h2>
+          <p class="project-desc sr">Hackathon project tackling indoor person localization from Room Impulse Responses (RIRs) captured by microphone arrays. Combines signal processing (spectrogram extraction, TDOA estimation) with deep learning models trained to regress 3D spatial coordinates from acoustic fingerprints — no camera or GPS required.</p>
+          <div class="project-metrics sr">
+            <div class="pm"><span class="pm-val">3D</span><span class="pm-lbl">Coordinates</span></div>
+            <div class="pm"><span class="pm-val">RIR</span><span class="pm-lbl">Based</span></div>
+            <div class="pm"><span class="pm-val">DL</span><span class="pm-lbl">Model</span></div>
+          </div>
+          <div class="project-tags sr">
+            <span class="ptag">Python</span><span class="ptag">Signal Processing</span><span class="ptag">Deep Learning</span><span class="ptag">TDOA</span><span class="ptag">NumPy</span><span class="ptag">PyTorch</span>
+          </div>
+          <a href="https://github.com/Warmvne/ia_data_hack_acoustic" target="_blank" rel="noopener" class="project-gh sr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub ↗
+          </a>
+        </div>
+      </div>
+    </li>
+
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════
+     SKILLS
+══════════════════════════════════ -->
+<section id="skills">
+  <div class="sec-header sr">
+    <p class="sec-eyebrow">Stack &amp; Tools</p>
+    <h2 class="sec-title">Technical<br/>Expertise</h2>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-card sr" style="transition-delay:.05s">
+      <div class="sk-header"><span class="sk-icon">⚡</span><span class="sk-title">Machine Learning</span></div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">XGBoost</span><span class="sk-pill highlight">Gradient Boosting</span><span class="sk-pill">Random Forest</span><span class="sk-pill highlight">SHAP</span><span class="sk-pill">Temporal CV</span><span class="sk-pill">Cox PH</span><span class="sk-pill">K-Means</span><span class="sk-pill">DBSCAN</span><span class="sk-pill">PCA</span><span class="sk-pill">UMAP</span>
+      </div>
+    </div>
+    <div class="skill-card sr" style="transition-delay:.12s">
+      <div class="sk-header"><span class="sk-icon">👁</span><span class="sk-title">Computer Vision</span></div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">YOLOv8</span><span class="sk-pill highlight">ByteTrack</span><span class="sk-pill highlight">MediaPipe</span><span class="sk-pill">Homography</span><span class="sk-pill">R3D-18</span><span class="sk-pill">Optical Flow</span><span class="sk-pill">OpenCV</span><span class="sk-pill">Pose Estimation</span>
+      </div>
+    </div>
+    <div class="skill-card sr" style="transition-delay:.19s">
+      <div class="sk-header"><span class="sk-icon">🏃</span><span class="sk-title">Sports Analytics</span></div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">Load Management</span><span class="sk-pill highlight">ACWR</span><span class="sk-pill">StatsBomb</span><span class="sk-pill">xG Modeling</span><span class="sk-pill">NBA Metrics</span><span class="sk-pill">GPS / Wearables</span><span class="sk-pill">Voronoi</span><span class="sk-pill">RAPTOR / BPM</span>
+      </div>
+    </div>
+    <div class="skill-card sr" style="transition-delay:.26s">
+      <div class="sk-header"><span class="sk-icon">🗄</span><span class="sk-title">Data Engineering</span></div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">dbt</span><span class="sk-pill highlight">Snowflake</span><span class="sk-pill">AWS S3</span><span class="sk-pill">Azure Databricks</span><span class="sk-pill">Delta Lake</span><span class="sk-pill">Data Vault</span><span class="sk-pill">Docker</span><span class="sk-pill">CI/CD</span>
+      </div>
+    </div>
+    <div class="skill-card sr" style="transition-delay:.33s">
+      <div class="sk-header"><span class="sk-icon">💻</span><span class="sk-title">Languages</span></div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">Python</span><span class="sk-pill highlight">SQL</span><span class="sk-pill">R</span><span class="sk-pill">JavaScript</span><span class="sk-pill">pandas</span><span class="sk-pill">PyTorch</span><span class="sk-pill">scikit-learn</span><span class="sk-pill">tidyverse</span><span class="sk-pill">lme4</span>
+      </div>
+    </div>
+    <div class="skill-card sr" style="transition-delay:.40s">
+      <div class="sk-header"><span class="sk-icon">📊</span><span class="sk-title">BI &amp; Visualization</span></div>
+      <div class="sk-pills">
+        <span class="sk-pill highlight">Power BI</span><span class="sk-pill">DAX</span><span class="sk-pill">MicroStrategy</span><span class="sk-pill">Plotly</span><span class="sk-pill">mplsoccer</span><span class="sk-pill">ggplot2</span><span class="sk-pill">KPI Governance</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     JOURNEY
+══════════════════════════════════ -->
+<section id="journey">
+  <div class="sec-header sr">
+    <p class="sec-eyebrow">Education &amp; Experience</p>
+    <h2 class="sec-title">Journey</h2>
+  </div>
+
+  <div class="timeline">
+
+    <!-- 1 — Research Engineer @ Aubey Solutec / Allianz Trade -->
+    <div class="tl-entry sr" data-map-id="map-1" data-lat="48.8566" data-lng="2.3522" data-zoom="14">
+      <div class="tl-dot"></div>
+      <div class="tl-header">
+        <span class="tl-date">Sept 2025 — Present</span>
+        <span class="tl-title">Research Engineer</span>
+        <span class="tl-org">Aubey Solutec / Allianz Trade — Paris, France</span>
+        <span class="tl-tag">Professional</span>
+      </div>
+      <div class="tl-bubble">
+        <div class="bubble-cols">
+          <div class="bubble-info">
+            <h3>Research Engineer</h3>
+            <p class="b-org">Aubey Solutec · Allianz Trade — Paris · Sept 2025 – Present</p>
+            <ul class="bubble-pts">
+              <li>Developed predictive models for credit risk and trade finance using gradient boosting and survival analysis techniques.</li>
+              <li>Built and maintained data pipelines with dbt and Snowflake, ensuring data quality across the analytical stack.</li>
+              <li>Designed interactive Power BI dashboards to monitor KPIs and support underwriting decisions.</li>
+              <li>Collaborated with business analysts to translate domain expertise into ML feature engineering strategies.</li>
+            </ul>
+          </div>
+          <div class="bubble-map" id="map-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 — Data Analyst @ Bosch Home Comfort -->
+    <div class="tl-entry sr" data-map-id="map-2" data-lat="48.9264" data-lng="2.4608" data-zoom="14">
+      <div class="tl-dot"></div>
+      <div class="tl-header">
+        <span class="tl-date">2023 — 2025</span>
+        <span class="tl-title">Data Analyst Apprentice</span>
+        <span class="tl-org">Bosch Home Comfort — Drancy, France</span>
+        <span class="tl-tag">Professional</span>
+      </div>
+      <div class="tl-bubble">
+        <div class="bubble-cols">
+          <div class="bubble-info">
+            <h3>Data Analyst Apprentice</h3>
+            <p class="b-org">Bosch Home Comfort — Drancy · 2023 – 2025</p>
+            <ul class="bubble-pts">
+              <li>Automated reporting workflows with Python and SQL, reducing manual data processing time by over 60%.</li>
+              <li>Built MicroStrategy and Power BI dashboards for supply-chain and sales performance monitoring.</li>
+              <li>Applied clustering (K-Means, DBSCAN) to segment customer data and support targeted marketing campaigns.</li>
+              <li>Participated in Data Vault migration project, contributing to ETL design and data quality validation.</li>
+            </ul>
+          </div>
+          <div class="bubble-map" id="map-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 — M.Eng ECE Paris -->
+    <div class="tl-entry sr" data-map-id="map-3" data-lat="48.8479" data-lng="2.2903" data-zoom="15">
+      <div class="tl-dot"></div>
+      <div class="tl-header">
+        <span class="tl-date">2022 — 2025</span>
+        <span class="tl-title">M.Eng. Data &amp; AI</span>
+        <span class="tl-org">ECE Paris — Paris 15e, France</span>
+        <span class="tl-tag">Education</span>
+      </div>
+      <div class="tl-bubble">
+        <div class="bubble-cols">
+          <div class="bubble-info">
+            <h3>M.Eng. Data &amp; Artificial Intelligence</h3>
+            <p class="b-org">ECE Paris — Quai de Grenelle, Paris 15e · 2022 – 2025</p>
+            <ul class="bubble-pts">
+              <li>5-year engineering programme specialising in data science, machine learning and AI systems.</li>
+              <li>Core courses: statistical learning, deep learning, NLP, computer vision, signal processing, data engineering.</li>
+              <li>Final-year projects focused on sports analytics and injury-risk prediction using real-world NBA datasets.</li>
+              <li>Student union involvement; represented the school at inter-school sport competitions.</li>
+            </ul>
+          </div>
+          <div class="bubble-map" id="map-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 — Exchange OMNES London -->
+    <div class="tl-entry sr" data-map-id="map-4" data-lat="51.5074" data-lng="-0.1278" data-zoom="13">
+      <div class="tl-dot"></div>
+      <div class="tl-header">
+        <span class="tl-date">Jan — Apr 2023</span>
+        <span class="tl-title">Semester Abroad</span>
+        <span class="tl-org">OMNES Education — London, UK</span>
+        <span class="tl-tag">Education</span>
+      </div>
+      <div class="tl-bubble">
+        <div class="bubble-cols">
+          <div class="bubble-info">
+            <h3>Exchange Semester — London</h3>
+            <p class="b-org">OMNES Education — London · Jan – Apr 2023</p>
+            <ul class="bubble-pts">
+              <li>Studied Business &amp; Data Analytics in an international cohort at OMNES Education London campus.</li>
+              <li>Developed cross-cultural communication skills and adapted to an English-speaking academic environment.</li>
+              <li>Explored London's sport-tech ecosystem, attending meetups focused on performance analytics in football.</li>
+              <li>Strengthened professional English for technical writing, presentations and team-based projects.</li>
+            </ul>
+          </div>
+          <div class="bubble-map" id="map-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 — CPGE Lycée Claude Bernard -->
+    <div class="tl-entry sr" data-map-id="map-5" data-lat="48.8565" data-lng="2.2773" data-zoom="15">
+      <div class="tl-dot"></div>
+      <div class="tl-header">
+        <span class="tl-date">2019 — 2022</span>
+        <span class="tl-title">Classe Préparatoire (MPSI/MP)</span>
+        <span class="tl-org">Lycée Claude Bernard — Paris 16e, France</span>
+        <span class="tl-tag">Education</span>
+      </div>
+      <div class="tl-bubble">
+        <div class="bubble-cols">
+          <div class="bubble-info">
+            <h3>CPGE — MPSI / MP</h3>
+            <p class="b-org">Lycée Claude Bernard — Paris 16e · 2019 – 2022</p>
+            <ul class="bubble-pts">
+              <li>Intensive two-year preparatory programme in Mathematics, Physics and Engineering Sciences.</li>
+              <li>Built strong foundations in analysis, algebra, mechanics and algorithmic thinking (Python/C++).</li>
+              <li>Prepared for and sat the concours for Grandes Écoles, leading to admission to ECE Paris engineering track.</li>
+              <li>Developed rigorous problem-solving methodology and high-pressure time management skills.</li>
+            </ul>
+          </div>
+          <div class="bubble-map" id="map-5"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 — Adaptive Rugby Coach -->
+    <div class="tl-entry sr" data-map-id="map-6" data-lat="49.0471" data-lng="2.0980" data-zoom="14">
+      <div class="tl-dot"></div>
+      <div class="tl-header">
+        <span class="tl-date">2020 — Present</span>
+        <span class="tl-title">Adaptive Rugby Coach</span>
+        <span class="tl-org">Christo Rugby Adapté — Saint-Ouen-l'Aumône, France</span>
+        <span class="tl-tag">Volunteer</span>
+      </div>
+      <div class="tl-bubble">
+        <div class="bubble-cols">
+          <div class="bubble-info">
+            <h3>Adaptive Rugby Coach</h3>
+            <p class="b-org">Christo Rugby Adapté — Saint-Ouen-l'Aumône · 2020 – Present</p>
+            <ul class="bubble-pts">
+              <li>Coach wheelchair rugby and adapted rugby sessions for players with physical and cognitive disabilities.</li>
+              <li>Design training programmes tailored to individual players' physical profiles and progress goals.</li>
+              <li>Coordinate with medical staff and families to ensure safe, inclusive, and motivating sessions.</li>
+              <li>Develop communication and leadership skills through regular match preparation and tournament participation.</li>
+            </ul>
+          </div>
+          <div class="bubble-map" id="map-6"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     CONTACT
+══════════════════════════════════ -->
+<section id="contact">
+  <h2 class="contact-heading sr">
+    Let's<br/><span>Work</span><br/>Together
+  </h2>
+  <a href="mailto:marwane.boubekeur@gmail.com" class="contact-btn sr">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/>
+    </svg>
+    Contact Me
+  </a>
+  <div class="contact-links sr">
+    <a href="mailto:marwane.boubekeur@gmail.com" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/>
+      </svg>
+      marwane.boubekeur@gmail.com
+    </a>
+    <a href="https://github.com/Warmvne" target="_blank" rel="noopener" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+      </svg>
+      github.com/Warmvne
+    </a>
+    <a href="https://linkedin.com" target="_blank" rel="noopener" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+        <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+      </svg>
+      LinkedIn
+    </a>
+    <a href="Marwane_Boubekeur_CV.pdf" download class="contact-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Download CV
+    </a>
+  </div>
+  <p class="footer-copy sr">© 2026 Marwane Boubekeur — Paris, France</p>
+</section>
+
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ── Canvas particles ── */
+const cvs = document.getElementById('bg'), ctx = cvs.getContext('2d');
+let W, H, pts;
+const resize = () => { W = cvs.width = window.innerWidth; H = cvs.height = window.innerHeight; };
+const mkPts  = () => pts = Array.from({length:50}, () => ({
+  x:Math.random()*W, y:Math.random()*H,
+  r:Math.random()*.9+.2,
+  vx:(Math.random()-.5)*.14, vy:(Math.random()-.5)*.14,
+  o:Math.random()*.18+.03
+}));
+const tick = () => {
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(197,240,201,${p.o})`; ctx.fill();
+  });
+  requestAnimationFrame(tick);
+};
+resize(); mkPts(); tick();
+window.addEventListener('resize',()=>{ resize(); mkPts(); });
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('on');
+    io.unobserve(e.target);
+  });
+}, { threshold: 0.10, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.sr, .sr-left, .sr-right').forEach(el => io.observe(el));
+
+/* ── Project border reveal ── */
+const borderIo = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('border-on'); borderIo.unobserve(e.target); }
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.project-item').forEach(el => borderIo.observe(el));
+
+/* ── Timeline bubbles + Leaflet maps ── */
+(function() {
+  const maps = {};
+
+  function initMap(entry) {
+    const mapId  = entry.dataset.mapId;
+    const lat    = parseFloat(entry.dataset.lat);
+    const lng    = parseFloat(entry.dataset.lng);
+    const zoom   = parseInt(entry.dataset.zoom, 10);
+    if (maps[mapId]) { maps[mapId].invalidateSize(); return; }
+
+    const m = L.map(mapId, { zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
+    m.setView([lat, lng], zoom);
+
+    // custom mint marker
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:14px;height:14px;border-radius:50%;
+        background:#c5f0c9;border:3px solid #101010;
+        box-shadow:0 0 0 2px #c5f0c9, 0 0 12px rgba(197,240,201,.7);
+      "></div>`,
+      iconSize:[14,14], iconAnchor:[7,7]
+    });
+    L.marker([lat, lng], {icon}).addTo(m);
+    maps[mapId] = m;
+  }
+
+  document.querySelectorAll('.tl-entry').forEach(entry => {
+    entry.addEventListener('click', function(e) {
+      // don't close if clicking inside the bubble
+      if (e.target.closest('.tl-bubble') && this.classList.contains('open')) return;
+
+      const wasOpen = this.classList.contains('open');
+
+      // close all
+      document.querySelectorAll('.tl-entry.open').forEach(el => el.classList.remove('open'));
+
+      if (!wasOpen) {
+        this.classList.add('open');
+        // init map after bubble becomes visible
+        requestAnimationFrame(() => { requestAnimationFrame(() => { initMap(this); }); });
+      }
+    });
+  });
+})();
+
+/* ── Emoji particles ── */
+(function() {
+  const ALL_EMOJIS = [
+    '⚽','🏀','🏈','🎾','🏋️','🤸','🏊','🚴','⛷️','🎿',
+    '📊','📈','🤖','🧠','💻','🔬','📡','🧬','⚡','🎯',
+    '🏆','🥇','💪','🎽','👟','🏅','📉','🗂️','🔭','🧮'
+  ];
+  const container = document.getElementById('emoji-bg');
+  const hero      = document.getElementById('hero');
+  const particles = [];
+  const COUNT     = 24;
+  const CX = 50, CY = 45, DEAD_RX = 28, DEAD_RY = 22;
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function randEmoji() { return ALL_EMOJIS[Math.floor(Math.random() * ALL_EMOJIS.length)]; }
+  function scatteredPos() {
+    let x, y, tries = 0;
+    do {
+      x = rand(3, 97); y = rand(4, 94);
+      const dx = (x - CX) / DEAD_RX, dy = (y - CY) / DEAD_RY;
+      if (dx * dx + dy * dy > 1) break;
+    } while (++tries < 40);
+    return { x, y };
+  }
+
+  let mx = 50, my = 50;
+  hero.addEventListener('mousemove', e => {
+    const r = hero.getBoundingClientRect();
+    mx = (e.clientX - r.left) / r.width  * 100;
+    my = (e.clientY - r.top)  / r.height * 100;
+  });
+  hero.addEventListener('mouseleave', () => { mx = 50; my = 50; });
+
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement('span');
+    el.className = 'ep';
+    const size = rand(38, 66);
+    el.style.fontSize = size + 'px';
+    el.textContent = randEmoji();
+    el.style.textShadow = '0 0 18px rgba(197,240,201,0)';
+
+    const pos = scatteredPos();
+    const p = {
+      el, x: pos.x, y: pos.y,
+      vx: rand(-0.04, 0.04) || 0.02,
+      vy: rand(-0.04, 0.04) || 0.02,
+      baseOpacity: rand(0.38, 0.72),
+      glowPhase: Math.random() * Math.PI * 2,
+      glowFreq:  rand(0.0008, 0.0018),
+      bobAmp:    rand(0.6, 1.6),
+      bobFreq:   rand(0.0007, 0.0014),
+      bobOffset: Math.random() * Math.PI * 2,
+      repelling: false,
+    };
+    el.style.opacity = p.baseOpacity;
+    container.appendChild(el);
+    particles.push(p);
+
+    el.addEventListener('click', () => {
+      let next;
+      do { next = randEmoji(); } while (next === el.textContent);
+      el.textContent = next;
+      el.style.textShadow = '0 0 32px rgba(197,240,201,.9)';
+      setTimeout(() => { el.style.textShadow = '0 0 18px rgba(197,240,201,0)'; }, 400);
+      p.vx = rand(-0.18, 0.18) || 0.1;
+      p.vy = rand(-0.18, 0.18) || 0.1;
+      el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+      el.addEventListener('animationend', () => el.classList.remove('pop'), {once:true});
+      setTimeout(() => { p.vx *= 0.15; p.vy *= 0.15; }, 1000);
+    });
+  }
+
+  function animEmoji(t) {
+    const W = hero.offsetWidth, H = hero.offsetHeight;
+    particles.forEach(p => {
+      const dx = p.x - mx, dy = p.y - my;
+      const dist = Math.sqrt(dx * dx + dy * (dy * W / H * W / H));
+      const RADIUS = 16;
+      if (dist < RADIUS && dist > 0.1) {
+        const force = (1 - dist / RADIUS) * 0.055;
+        p.vx += (dx / dist) * force;
+        p.vy += (dy / dist) * force;
+        p.repelling = true;
+      } else { p.repelling = false; }
+
+      p.y += Math.sin(t * p.bobFreq + p.bobOffset) * p.bobAmp * 0.0014;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      const maxV = 0.06, speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (speed > maxV) { p.vx *= 0.94; p.vy *= 0.94; }
+
+      if (p.x < 2)  { p.x = 2;  p.vx =  Math.abs(p.vx); }
+      if (p.x > 97) { p.x = 97; p.vx = -Math.abs(p.vx); }
+      if (p.y < 3)  { p.y = 3;  p.vy =  Math.abs(p.vy); }
+      if (p.y > 94) { p.y = 94; p.vy = -Math.abs(p.vy); }
+
+      const glow = (Math.sin(t * p.glowFreq + p.glowPhase) + 1) / 2;
+      const glowAlpha = (p.repelling ? 0.7 : glow * 0.35).toFixed(2);
+      p.el.style.textShadow = `0 0 20px rgba(197,240,201,${glowAlpha})`;
+      p.el.style.opacity = (p.baseOpacity + glow * 0.18).toFixed(2);
+      p.el.style.left = p.x + '%';
+      p.el.style.top  = p.y + '%';
+    });
+    requestAnimationFrame(animEmoji);
+  }
+  requestAnimationFrame(animEmoji);
+})();
+</script>
+</body>
+</html>
